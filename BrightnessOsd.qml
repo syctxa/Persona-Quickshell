@@ -15,10 +15,26 @@ Scope {
     property bool shouldShowOsd: false
     property bool initialized: false
 
+    property string backlightDevice: ""
+
+    Process {
+        id: findBacklight
+        command: ["sh", "-c", "ls /sys/class/backlight | head -n 1"]
+        running: true
+        stdout: SplitParser {
+            onRead: data => {
+                let device = data.trim();
+                if (device) {
+                    root.backlightDevice = device;
+                }
+            }
+        }
+    }
+
     Timer {
         id: updateTimer
         interval: 100
-        running: true
+        running: root.backlightDevice !== ""
         repeat: true
         triggeredOnStart: true
         onTriggered: {
@@ -29,7 +45,7 @@ Scope {
 
     FileView {
         id: currentFile
-        path: "/sys/class/backlight/nvidia_0/brightness"
+        path: root.backlightDevice ? "/sys/class/backlight/" + root.backlightDevice + "/brightness" : ""
         onLoaded: {
             var val = parseInt(text().trim())
             if (isNaN(val)) return;
@@ -48,7 +64,7 @@ Scope {
 
     FileView {
         id: maxFile
-        path: "/sys/class/backlight/nvidia_0/max_brightness"
+        path: root.backlightDevice ? "/sys/class/backlight/" + root.backlightDevice + "/max_brightness" : ""
         onLoaded: {
             var val = parseInt(text().trim())
              if (!isNaN(val)) {

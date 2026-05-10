@@ -8,9 +8,25 @@ QtObject {
   property string status: ""
   property string icon: "󰁺"
   
+  property string batteryDevice: ""
+  
+  Process {
+    id: findBattery
+    command: ["sh", "-c", "ls /sys/class/power_supply | grep ^BAT | head -n 1"]
+    running: true
+    stdout: SplitParser {
+      onRead: data => {
+        let device = data.trim();
+        if (device) {
+          root.batteryDevice = device;
+        }
+      }
+    }
+  }
+
   property Timer updateTimer: Timer {
     interval: 5000
-    running: true
+    running: root.batteryDevice !== ""
     repeat: true
     triggeredOnStart: true
     onTriggered: {
@@ -20,7 +36,7 @@ QtObject {
   }
   
   property FileView capacityFile: FileView {
-    path: "/sys/class/power_supply/BAT0/capacity"
+    path: root.batteryDevice ? "/sys/class/power_supply/" + root.batteryDevice + "/capacity" : ""
     onLoaded: {
       root.capacity = parseInt(text().trim())
       root.updateIcon()
@@ -28,7 +44,7 @@ QtObject {
   }
   
   property FileView statusFile: FileView {
-    path: "/sys/class/power_supply/BAT0/status"
+    path: root.batteryDevice ? "/sys/class/power_supply/" + root.batteryDevice + "/status" : ""
     onLoaded: {
       root.status = text().trim()
       root.updateIcon()
