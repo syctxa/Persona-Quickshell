@@ -7,48 +7,48 @@ ShellRoot {
         id: colors
         property color foreground: "#ffffff"
     }
-    
+
     Variants {
         model: Quickshell.screens
-        
+
         PanelWindow {
             id: clickWindow
             required property var modelData
             screen: modelData
-            
+
             anchors {
                 top: true
                 left: true
                 right: true
                 bottom: true
             }
-            
+
             color: "transparent"
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-            
+
             MouseArea {
                 anchors.fill: parent
                 propagateComposedEvents: true
-                onClicked: (mouse) => {
-                    console.log("Click detected at", mouse.x, mouse.y);
-                    effectComponent.createObject(clickWindow.contentItem, {
-                        x: mouse.x - 10,
-                        y: mouse.y - 10
-                    });
-                    mouse.accepted = false;  // Let clicks pass through
-                }
+                onClicked: mouse => {
+                               console.log("Click detected at", mouse.x, mouse.y)
+                               effectComponent.createObject(clickWindow.contentItem, {
+                                                                "x": mouse.x - 10,
+                                                                "y": mouse.y - 10
+                                                            })
+                               mouse.accepted = false // Let clicks pass through
+                           }
             }
-            
+
             Component {
                 id: effectComponent
-                
+
                 Item {
                     id: root
                     width: 20
                     height: 20
-                    
+
                     component ThisAnim: SequentialAnimation {
                         id: thisanim
                         property int animDuration: 150
@@ -90,14 +90,14 @@ ShellRoot {
                             }
                         }
                         onFinished: {
-                            root.destroy();
+                            root.destroy()
                         }
                     }
-                    
+
                     component ThisRectangle: Rectangle {
                         color: colors.foreground
                     }
-                    
+
                     component PartialEffect: Item {
                         id: effect
                         property real wid: 4
@@ -134,11 +134,11 @@ ShellRoot {
                             }
                         }
                     }
-                    
+
                     PartialEffect {
                         id: vert
                     }
-                    
+
                     PartialEffect {
                         id: fourtyFive
                         rotation: 45

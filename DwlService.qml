@@ -13,7 +13,7 @@ Singleton {
     property int tagCount: 9
     property string activeOutput: ""
 
-    signal stateChanged()
+    signal stateChanged
 
     Component.onCompleted: {
         checkMangoWC()
@@ -21,7 +21,7 @@ Singleton {
 
     // Timer to poll MangoWC state - faster polling for better responsiveness
     Timer {
-        interval: 100  
+        interval: 100
         running: root.dwlAvailable
         repeat: true
         onTriggered: root.getTagState()
@@ -35,7 +35,7 @@ Singleton {
         onExited: exitCode => {
             const wasAvailable = dwlAvailable
             dwlAvailable = (exitCode === 0)
-            
+
             if (dwlAvailable && !wasAvailable) {
                 getTagState()
             } else if (!dwlAvailable && wasAvailable) {
@@ -49,7 +49,7 @@ Singleton {
         id: tagStateProcess
         command: ["mmsg", "-g", "-t", "-l"]
         running: false
-        
+
         property var lineBuffer: []
 
         stdout: SplitParser {
@@ -71,52 +71,52 @@ Singleton {
         try {
             const lines = data.trim().split('\n')
             const newOutputs = {}
-            
-            for (const line of lines) {
+
+            for (const line in lines) {
                 const parts = line.trim().split(/\s+/)
-                
-                if (parts.length < 3) continue
-                
+
+                if (parts.length < 3)
+                    continue
+
                 const outputName = parts[0]
                 const key = parts[1]
-                
+
                 if (!newOutputs[outputName]) {
                     newOutputs[outputName] = {
-                        name: outputName,
-                        tags: Array(tagCount).fill(null).map((_, i) => ({
-                            tag: i,
-                            state: 0,
-                            clients: 0
-                        })),
-                        layout: "",
-                        isSelected: true
+                        "name": outputName,
+                        "tags": Array(tagCount).fill(null).map((_, i) => ({
+                                                                              "tag": i,
+                                                                              "state": 0,
+                                                                              "clients": 0
+                                                                          })),
+                        "layout": "",
+                        "isSelected": true
                     }
                 }
-                
+
                 if (key === "tag" && parts.length >= 5) {
                     const tagNum = parseInt(parts[2]) - 1
                     const state = parseInt(parts[3])
                     const clients = parseInt(parts[4])
-                    
+
                     if (tagNum >= 0 && tagNum < tagCount) {
                         newOutputs[outputName].tags[tagNum] = {
-                            tag: tagNum,
-                            state: state,
-                            clients: clients
+                            "tag": tagNum,
+                            "state": state,
+                            "clients": clients
                         }
                     }
                 } else if (key === "layout") {
                     newOutputs[outputName].layout = parts[2]
                 }
             }
-            
+
             outputs = newOutputs
             if (Object.keys(newOutputs).length > 0) {
                 activeOutput = Object.keys(newOutputs)[0]
             }
-            
+
             stateChanged()
-            
         } catch (e) {
             console.error("Error parsing tag output:", e)
         }
@@ -138,11 +138,10 @@ Singleton {
 
     function getActiveTags(outputName) {
         const output = getOutputState(outputName)
-        if (!output || !output.tags) return []
-        
-        return output.tags
-            .filter(tag => tag.state === 1)
-            .map(tag => tag.tag)
+        if (!output || !output.tags)
+            return []
+
+        return output.tags.filter(tag => tag.state === 1).map(tag => tag.tag)
     }
 
     function switchToTag(outputName, tagIndex) {
@@ -150,36 +149,38 @@ Singleton {
             console.warn("MangoWC not available")
             return
         }
-        
+
         const tagNumber = tagIndex + 1
         console.log("Switching to tag", tagNumber, "on output", outputName)
-        
+
         Quickshell.execDetached(["mmsg", "-t", tagNumber.toString()])
-        
+
         refreshTimer.restart()
     }
 
     function toggleTag(outputName, tagIndex) {
-        if (!dwlAvailable) return
+        if (!dwlAvailable)
+            return
 
         const output = getOutputState(outputName)
-        if (!output || !output.tags) return
+        if (!output || !output.tags)
+            return
 
         let currentMask = 0
         output.tags.forEach(tag => {
-            if (tag.state === 1) {
-                currentMask |= (1 << tag.tag)
-            }
-        })
+                                if (tag.state === 1) {
+                                    currentMask |= (1 << tag.tag)
+                                }
+                            })
 
         const clickedMask = 1 << tagIndex
         let newMask = currentMask ^ clickedMask
         if (newMask === 0) {
             newMask = clickedMask
         }
-        
+
         console.log("Toggling tag", tagIndex + 1, "on output", outputName, "new mask", newMask)
-        
+
         Quickshell.execDetached(["mmsg", "-o", outputName, "-v", newMask.toString()])
         refreshTimer.restart()
     }
@@ -189,13 +190,13 @@ Singleton {
             console.warn("MangoWC not available")
             return
         }
-        
+
         const tagNumber = tagIndex + 1
         console.log("Moving window to tag", tagNumber, "on output", outputName)
-        
+
         // Use -s -t to set/move the focused window to a tag
         Quickshell.execDetached(["mmsg", "-o", outputName, "-s", "-t", tagNumber.toString()])
-        
+
         refreshTimer.restart()
     }
 

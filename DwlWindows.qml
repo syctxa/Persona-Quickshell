@@ -11,7 +11,7 @@ Singleton {
     property var windowList: []
     property var manualTagMap: ({})
     property var manualMonitorMap: ({})
-    signal windowsChanged()
+    signal windowsChanged
     function windowsForTag(monitorName, tagIndex) {
         return windowList.filter(w => w.monitorName === monitorName && w.tagIndex === tagIndex)
     }
@@ -19,14 +19,16 @@ Singleton {
         return windowsForTag(monitorName, tagIndex).length
     }
     function moveWindowToTag(toplevel, targetTagIndex) {
-        if (!toplevel) return
+        if (!toplevel)
+            return
         let monitorName = ""
         if (toplevel.outputs && toplevel.outputs.length > 0) {
             monitorName = toplevel.outputs[0].name
         }
         let key = getWindowKey(toplevel)
         manualTagMap[key] = targetTagIndex
-        if (monitorName) manualMonitorMap[key] = monitorName
+        if (monitorName)
+            manualMonitorMap[key] = monitorName
         toplevel.activate()
         let outputToUse = monitorName || DwlService.activeOutput
         moveTimer.targetTag = targetTagIndex
@@ -36,7 +38,8 @@ Singleton {
     }
 
     function closeWindow(toplevel) {
-        if (!toplevel) return
+        if (!toplevel)
+            return
         let key = getWindowKey(toplevel)
         delete manualTagMap[key]
         delete manualMonitorMap[key]
@@ -51,11 +54,11 @@ Singleton {
     function refreshWindowList() {
         let toplevels = ToplevelManager.toplevels.values.filter(t => t && t.title !== "")
         let newWindowList = []
-        
+
         let outputNames = Object.keys(DwlService.outputs)
-        
-        let monitorTagCounts = {} 
-        for (let name of outputNames) {
+
+        let monitorTagCounts = {}
+        for (let name in outputNames) {
             let state = DwlService.getOutputState(name)
             if (state && state.tags) {
                 monitorTagCounts[name] = state.tags.map(t => t.clients || 0)
@@ -63,130 +66,134 @@ Singleton {
                 monitorTagCounts[name] = Array(9).fill(0)
             }
         }
-        
+
         let monitorAssignedCounts = {}
-        for (let name of outputNames) {
+        for (let name in outputNames) {
             monitorAssignedCounts[name] = Array(9).fill(0)
         }
 
         function monitorHasRoom(mName) {
-            if (!monitorTagCounts[mName]) return false
-            let totalExpected = monitorTagCounts[mName].reduce((a,b) => a+b, 0)
-            let totalAssigned = monitorAssignedCounts[mName].reduce((a,b) => a+b, 0)
+            if (!monitorTagCounts[mName])
+                return false
+            let totalExpected = monitorTagCounts[mName].reduce((a, b) => a + b, 0)
+            let totalAssigned = monitorAssignedCounts[mName].reduce((a, b) => a + b, 0)
             return totalAssigned < totalExpected
         }
-        
+
         let knownToplevels = []
-        let unknownToplevels = [] 
-        
-        for (let toplevel of toplevels) {
+        let unknownToplevels = []
+
+        for (let toplevel in toplevels) {
             let key = getWindowKey(toplevel)
-            
+
             if (manualMonitorMap[key]) {
                 toplevel.manualMonitor = manualMonitorMap[key]
                 toplevel.manualTag = manualTagMap[key]
                 knownToplevels.push(toplevel)
                 continue
             }
-            
+
             let foundOutput = false
             if (toplevel.outputs && toplevel.outputs.length > 0) {
-                 for (let o of toplevel.outputs) {
-                     if (outputNames.includes(o.name)) {
-                         toplevel.detectedMonitor = o.name
-                         foundOutput = true
-                         break
-                     }
-                 }
+                for (let o in toplevel.outputs) {
+                    if (outputNames.includes(o.name)) {
+                        toplevel.detectedMonitor = o.name
+                        foundOutput = true
+                        break
+                    }
+                }
             }
-            
+
             if (foundOutput) {
                 knownToplevels.push(toplevel)
             } else {
                 unknownToplevels.push(toplevel)
             }
         }
-        
-        for (let toplevel of knownToplevels) {
+
+        for (let toplevel in knownToplevels) {
             let key = getWindowKey(toplevel)
             let monitorName = toplevel.manualMonitor || toplevel.detectedMonitor
-            
+
             let assignedTag = -1
-            
+
             if (toplevel.manualTag !== undefined) {
                 assignedTag = toplevel.manualTag
             } else {
                 let counts = monitorTagCounts[monitorName] || Array(9).fill(0)
                 let assigneds = monitorAssignedCounts[monitorName] || Array(9).fill(0)
-                
-                for (let t = 0; t < 9; t++) {
+
+                for (var t = 0; t < 9; t++) {
                     if (counts[t] > 0 && assigneds[t] < counts[t]) {
                         assignedTag = t
                         break
                     }
                 }
                 if (assignedTag === -1) {
-                     let activeTags = DwlService.getActiveTags(monitorName)
-                     assignedTag = activeTags.length > 0 ? activeTags[0] : 0
+                    let activeTags = DwlService.getActiveTags(monitorName)
+                    assignedTag = activeTags.length > 0 ? activeTags[0] : 0
                 }
             }
-            
-            if (!monitorAssignedCounts[monitorName]) monitorAssignedCounts[monitorName] = Array(9).fill(0)
+
+            if (!monitorAssignedCounts[monitorName])
+                monitorAssignedCounts[monitorName] = Array(9).fill(0)
             monitorAssignedCounts[monitorName][assignedTag]++
-            
+
             newWindowList.push({
-                toplevel: toplevel,
-                tagIndex: assignedTag,
-                monitorName: monitorName,
-                appId: toplevel.appId || "unknown",
-                title: toplevel.title || "untitled",
-                activated: toplevel.activated || false
-            })
+                                   "toplevel": toplevel,
+                                   "tagIndex": assignedTag,
+                                   "monitorName": monitorName,
+                                   "appId": toplevel.appId || "unknown",
+                                   "title": toplevel.title || "untitled",
+                                   "activated": toplevel.activated || false
+                               })
         }
-        for (let toplevel of unknownToplevels) {
+        for (let toplevel in unknownToplevels) {
             let chosenMonitor = ""
-            
+
             if (monitorHasRoom(DwlService.activeOutput)) {
                 chosenMonitor = DwlService.activeOutput
             } else {
-                for (let m of outputNames) {
+                for (let m in outputNames) {
                     if (monitorHasRoom(m)) {
                         chosenMonitor = m
                         break
                     }
                 }
             }
-            
-            if (!chosenMonitor) continue
-            
+
+            if (!chosenMonitor)
+                continue
+
             let counts = monitorTagCounts[chosenMonitor] || Array(9).fill(0)
             let assigneds = monitorAssignedCounts[chosenMonitor] || Array(9).fill(0)
             let assignedTag = -1
-            
-            for (let t = 0; t < 9; t++) {
+
+            for (var t = 0; t < 9; t++) {
                 if (counts[t] > 0 && assigneds[t] < counts[t]) {
                     assignedTag = t
                     break
                 }
             }
             if (assignedTag === -1) {
-                 let activeTags = DwlService.getActiveTags(chosenMonitor)
-                 assignedTag = activeTags.length > 0 ? activeTags[0] : 0
+                let activeTags = DwlService.getActiveTags(chosenMonitor)
+                assignedTag = activeTags.length > 0 ? activeTags[0] : 0
             }
-            
-            if (!monitorAssignedCounts[chosenMonitor]) monitorAssignedCounts[chosenMonitor] = Array(9).fill(0)
+
+            if (!monitorAssignedCounts[chosenMonitor])
+                monitorAssignedCounts[chosenMonitor] = Array(9).fill(0)
             monitorAssignedCounts[chosenMonitor][assignedTag]++
-            
+
             newWindowList.push({
-                toplevel: toplevel,
-                tagIndex: assignedTag,
-                monitorName: chosenMonitor,
-                appId: toplevel.appId || "unknown",
-                title: toplevel.title || "untitled",
-                activated: toplevel.activated || false
-            })
+                                   "toplevel": toplevel,
+                                   "tagIndex": assignedTag,
+                                   "monitorName": chosenMonitor,
+                                   "appId": toplevel.appId || "unknown",
+                                   "title": toplevel.title || "untitled",
+                                   "activated": toplevel.activated || false
+                               })
         }
-        
+
         windowList = newWindowList
         windowsChanged()
     }
@@ -208,12 +215,16 @@ Singleton {
 
     Connections {
         target: ToplevelManager.toplevels
-        function onValuesChanged() { refreshWindowList() }
+        function onValuesChanged() {
+            refreshWindowList()
+        }
     }
 
     Connections {
         target: DwlService
-        function onStateChanged() { refreshWindowList() }
+        function onStateChanged() {
+            refreshWindowList()
+        }
     }
 
     Component.onCompleted: refreshWindowList()

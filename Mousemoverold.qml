@@ -7,7 +7,9 @@ import Quickshell.Io
 Scope {
     id: root
     property bool shouldShow: false
-    Colors { id: colors }
+    Colors {
+        id: colors
+    }
     property int workspacesShown: 10
     property int columns: 5
     property int rows: 2
@@ -15,22 +17,22 @@ Scope {
     property real workspaceHeight: 150
     property real workspaceSpacing: 14
     readonly property var jpN: ({
-        1: "一",
-        2: "二",
-        3: "三",
-        4: "四",
-        5: "五",
-        6: "六",
-        7: "七",
-        8: "八",
-        9: "九",
-        10: "十"
-    })
+                                    "1": "一",
+                                    "2": "二",
+                                    "3": "三",
+                                    "4": "四",
+                                    "5": "五",
+                                    "6": "六",
+                                    "7": "七",
+                                    "8": "八",
+                                    "9": "九",
+                                    "10": "十"
+                                })
 
     property var activeMonitor: Hyprland.focusedMonitor
     property real monitorWidth: activeMonitor?.width ?? 1920
     property real monitorHeight: activeMonitor?.height ?? 1080
-    
+
     readonly property real scaleX: workspaceWidth / monitorWidth
     readonly property real scaleY: workspaceHeight / monitorHeight
 
@@ -48,8 +50,7 @@ Scope {
             root.activeWorkspaceId = Hyprland.focusedWorkspace?.id ?? 1
         }
         function onRawEvent(event) {
-            if (event.name === "openwindow" || event.name === "closewindow" || 
-                event.name === "movewindow" || event.name === "movewindowv2") {
+            if (event.name === "openwindow" || event.name === "closewindow" || event.name === "movewindow" || event.name === "movewindowv2") {
                 updateWindowList()
             }
         }
@@ -62,33 +63,35 @@ Scope {
     Process {
         id: getClientsProc
         command: ["bash", "-c", "hyprctl clients -j"]
-        
+
         stdout: StdioCollector {
             onStreamFinished: {
                 const rawText = this.text.trim()
-                
+
                 if (rawText.length === 0 || rawText.includes("HYPRLAND_INSTANCE_SIGNATURE not set")) {
                     console.warn("Hyprland not available or not running")
                     root.windowList = []
                     return
                 }
-                
+
                 try {
                     const clients = JSON.parse(rawText)
                     let windows = []
-                    
-                    for (let i = 0; i < clients.length; i++) {
+
+                    for (var i = 0; i < clients.length; i++) {
                         let client = clients[i]
                         windows.push({
-                            workspace: { id: client.workspace?.id ?? 1 },
-                            address: client.address ?? "",
-                            at: [client.at?.[0] ?? 0, client.at?.[1] ?? 0],
-                            size: [client.size?.[0] ?? 100, client.size?.[1] ?? 100],
-                            class: client.class ?? "Window",
-                            floating: client.floating ?? false
-                        })
+                                         "workspace": {
+                                             "id": client.workspace?.id ?? 1
+                                         },
+                                         "address": client.address ?? "",
+                                         "at": [client.at[0] ?? 0, client.at[1] ?? 0],
+                                         "size": [client.size[0] ?? 100, client.size[1] ?? 100],
+                                         "class": client.class ?? "Window",
+                                         "floating": client.floating ?? false
+                                     })
                     }
-                    
+
                     root.windowList = windows
                 } catch (e) {
                     console.error("Failed to parse clients:", e)
@@ -108,21 +111,21 @@ Scope {
 
     LazyLoader {
         active: root.shouldShow
-        
+
         PanelWindow {
             id: overviewWindow
             visible: root.shouldShow
             screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-            
+
             anchors {
                 top: true
                 bottom: true
                 left: true
                 right: true
             }
-            
+
             color: "transparent"
-            
+
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: contentItem.visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -130,7 +133,7 @@ Scope {
                 id: background
                 anchors.fill: parent
                 color: "#CC000000"
-                
+
                 MouseArea {
                     anchors.fill: parent
                     onClicked: root.shouldShow = false
@@ -205,12 +208,14 @@ Scope {
                                 radius: parent.radius
                                 color: "transparent"
                                 border.width: workspaceRect.isDropTarget ? 3 : 0
-                                border.color:colors.color3 
+                                border.color: colors.color3
                                 opacity: 0.8
                                 visible: workspaceRect.isDropTarget
 
                                 Behavior on border.width {
-                                    NumberAnimation { duration: 150 }
+                                    NumberAnimation {
+                                        duration: 150
+                                    }
                                 }
                             }
 
@@ -306,7 +311,7 @@ Scope {
                                 color: windowItem.hovered ? colors.color5 : colors.color1
                                 radius: 8
                                 border.width: windowItem.isDragging ? 2 : 0
-                                border.color: root.isDraggingToClose ? "#FF4444" :colors.color5 
+                                border.color: root.isDraggingToClose ? "#FF4444" : colors.color5
 
                                 Behavior on color {
                                     ColorAnimation {
@@ -316,7 +321,9 @@ Scope {
                                 }
 
                                 Behavior on border.width {
-                                    NumberAnimation { duration: 150 }
+                                    NumberAnimation {
+                                        duration: 150
+                                    }
                                 }
 
                                 Text {
@@ -334,11 +341,13 @@ Scope {
                             Rectangle {
                                 anchors.fill: parent
                                 radius: windowBackground.radius
-                                color: root.isDraggingToClose && windowItem.isDragging ? "#FF4444" :colors.color4 
+                                color: root.isDraggingToClose && windowItem.isDragging ? "#FF4444" : colors.color4
                                 opacity: root.isDraggingToClose && windowItem.isDragging ? 0.15 : (windowItem.hovered && !windowItem.isDragging ? 0.12 : 0)
 
                                 Behavior on opacity {
-                                    NumberAnimation { duration: 150 }
+                                    NumberAnimation {
+                                        duration: 150
+                                    }
                                 }
                             }
 
@@ -358,12 +367,12 @@ Scope {
                                 onExited: windowItem.hovered = false
 
                                 onPressed: mouse => {
-                                    wasDragging = false
-                                    windowItem.isDragging = true
-                                    root.draggingFromWorkspace = windowItem.workspaceId
-                                    windowItem.Drag.hotSpot.x = mouse.x
-                                    windowItem.Drag.hotSpot.y = mouse.y
-                                }
+                                               wasDragging = false
+                                               windowItem.isDragging = true
+                                               root.draggingFromWorkspace = windowItem.workspaceId
+                                               windowItem.Drag.hotSpot.x = mouse.x
+                                               windowItem.Drag.hotSpot.y = mouse.y
+                                           }
 
                                 onPositionChanged: {
                                     if (windowItem.isDragging) {

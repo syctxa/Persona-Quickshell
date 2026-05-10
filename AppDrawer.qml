@@ -7,14 +7,24 @@ import Quickshell.Wayland
 
 Scope {
     id: root
-    Colors { id: colors }
-    Mousemover { id: mousemover }
-    Mousemoverwlroots { id: mousemoverwlroots }
-    P3rpause { id: p3rpause }
-    StatsDetail { id: statsDetail }
+    Colors {
+        id: colors
+    }
+    Mousemover {
+        id: mousemover
+    }
+    Mousemoverwlroots {
+        id: mousemoverwlroots
+    }
+    P3rpause {
+        id: p3rpause
+    }
+    StatsDetail {
+        id: statsDetail
+    }
     Variants {
         model: Quickshell.screens
-        
+
         PanelWindow {
             id: panel
             property var modelData
@@ -41,8 +51,8 @@ Scope {
                     repeat: false
                     onTriggered: {
                         if (!toolskiRoot.isExpanded) {
-                            toolskiRoot.isHovered = false;
-                            toolskiRoot.isExpanded = false;
+                            toolskiRoot.isHovered = false
+                            toolskiRoot.isExpanded = false
                         }
                     }
                 }
@@ -54,11 +64,11 @@ Scope {
                     HoverHandler {
                         onHoveredChanged: {
                             if (hovered) {
-                                toolskiRoot.isHovered = true;
-                                autoHideTimer.stop();
+                                toolskiRoot.isHovered = true
+                                autoHideTimer.stop()
                             } else {
                                 if (!toolskiRoot.isExpanded) {
-                                    autoHideTimer.restart();
+                                    autoHideTimer.restart()
                                 }
                             }
                         }
@@ -164,11 +174,11 @@ Scope {
                         cursorShape: Qt.PointingHandCursor
                         onHoveredChanged: {
                             if (hovered) {
-                                toolskiRoot.isHovered = true;
-                                autoHideTimer.stop();
+                                toolskiRoot.isHovered = true
+                                autoHideTimer.stop()
                             } else {
                                 if (!toolskiRoot.isExpanded) {
-                                    autoHideTimer.restart();
+                                    autoHideTimer.restart()
                                 }
                             }
                         }
@@ -176,11 +186,11 @@ Scope {
 
                     TapHandler {
                         onTapped: {
-                            toolskiRoot.isExpanded = !toolskiRoot.isExpanded;
+                            toolskiRoot.isExpanded = !toolskiRoot.isExpanded
                             if (toolskiRoot.isExpanded) {
-                                autoHideTimer.stop();
+                                autoHideTimer.stop()
                             } else {
-                                autoHideTimer.restart();
+                                autoHideTimer.restart()
                             }
                         }
                     }
@@ -196,23 +206,25 @@ Scope {
                     visible: mainCircle.visible
 
                     Repeater {
-                        model: [
-                            {
-                                icon: "^▽^",
-                                label: "Windows",
-                                action: () => { mousemover.shouldShow = true }
-                            },
-                            {
-                                icon: "╥_╥",
-                                label: "Stats",
-                                action: () => { statsDetail.shouldShow = true }
-                            },
-                            {
-                                icon: "•́︿•̀",
-                                label: "Power",
-                                action: () => { p3rpause.shouldShow = true }
-                            }
-                        ]
+                        model: [{
+                                "icon": "^▽^",
+                                "label": "Windows",
+                                "action": () => {
+                                    mousemover.shouldShow = true
+                                }
+                            }, {
+                                "icon": "╥_╥",
+                                "label": "Stats",
+                                "action": () => {
+                                    statsDetail.shouldShow = true
+                                }
+                            }, {
+                                "icon": "•́︿•̀",
+                                "label": "Power",
+                                "action": () => {
+                                    p3rpause.shouldShow = true
+                                }
+                            }]
 
                         Rectangle {
                             id: blade
@@ -270,13 +282,13 @@ Scope {
                             Row {
                                 anchors.centerIn: parent
                                 spacing: 8
-                                
+
                                 Text {
                                     text: modelData.icon
                                     color: colors.foreground
                                     font.pixelSize: 14
                                 }
-                                
+
                                 Text {
                                     text: modelData.label
                                     color: colors.foreground
@@ -290,7 +302,7 @@ Scope {
                                 cursorShape: Qt.PointingHandCursor
                                 onHoveredChanged: {
                                     if (hovered) {
-                                        autoHideTimer.stop();
+                                        autoHideTimer.stop()
                                     }
                                 }
                             }
@@ -304,28 +316,28 @@ Scope {
                                 property real dragStartX: 0
 
                                 onPressed: mouse => {
-                                    startX = blade.x;
-                                    dragStartX = mouse.x;
-                                }
+                                               startX = blade.x
+                                               dragStartX = mouse.x
+                                           }
 
                                 onPositionChanged: mouse => {
-                                    if (pressed) {
-                                        var delta = mouse.x - dragStartX;
-                                        if (delta > 0) {
-                                            blade.x = startX + delta;
-                                        }
-                                    }
-                                }
+                                                       if (pressed) {
+                                                           var delta = mouse.x - dragStartX
+                                                           if (delta > 0) {
+                                                               blade.x = startX + delta
+                                                           }
+                                                       }
+                                                   }
 
                                 onReleased: mouse => {
-                                    var delta = mouse.x - dragStartX;
-                                    if (delta > 50) {
-                                        modelData.action();
-                                        toolskiRoot.isExpanded = false;
-                                        toolskiRoot.isHovered = false;
-                                    }
-                                    blade.x = Qt.binding(() => startX);
-                                }
+                                                var delta = mouse.x - dragStartX
+                                                if (delta > 50) {
+                                                    modelData.action()
+                                                    toolskiRoot.isExpanded = false
+                                                    toolskiRoot.isHovered = false
+                                                }
+                                                blade.x = Qt.binding(() => startX)
+                                            }
                             }
 
                             Behavior on x {
@@ -342,10 +354,10 @@ Scope {
                     anchors.fill: parent
                     enabled: toolskiRoot.isExpanded
                     z: -1
-                    
+
                     onClicked: {
-                        toolskiRoot.isExpanded = false;
-                        autoHideTimer.restart();
+                        toolskiRoot.isExpanded = false
+                        autoHideTimer.restart()
                     }
                 }
             }

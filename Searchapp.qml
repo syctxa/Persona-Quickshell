@@ -11,33 +11,35 @@ import "Vitreus/be/glass" as GlassEffect
 
 Scope {
     id: root
-    
-    Colors { id: colors }
-    
+
+    Colors {
+        id: colors
+    }
+
     property bool forcedOpen: false
 
     IpcHandler {
         target: "searchapp"
         function toggle() {
-             root.forcedOpen = !root.forcedOpen
+            root.forcedOpen = !root.forcedOpen
         }
         function open() {
-             root.forcedOpen = true
+            root.forcedOpen = true
         }
         function close() {
-             root.forcedOpen = false
+            root.forcedOpen = false
         }
     }
 
     Variants {
         model: Quickshell.screens
-        
+
         PanelWindow {
             id: window
             property var modelData
             screen: modelData
-            
-            visible: root.forcedOpen 
+
+            visible: root.forcedOpen
 
             anchors {
                 top: true
@@ -46,8 +48,8 @@ Scope {
             }
 
             implicitWidth: contentItem.width + 20
-            
-            color: "transparent" 
+
+            color: "transparent"
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "searchapp"
             WlrLayershell.keyboardFocus: contentItem.visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -66,12 +68,15 @@ Scope {
             }
 
             Behavior on width {
-                NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                NumberAnimation {
+                    duration: 300
+                    easing.type: Easing.OutCubic
+                }
             }
 
             Item {
                 id: contentItem
-                
+
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.leftMargin: 50
@@ -95,80 +100,92 @@ Scope {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         Layout.leftMargin: -90
-                        
+
                         property int currentIndex: 0
                         property real arcRadius: 150
                         property real arcAngleSpan: 100
-                        
+
                         property var filteredApps: {
-                            const stxt = search.text.toLowerCase();
+                            const stxt = search.text.toLowerCase()
                             if (stxt === "") {
-                                return DesktopEntries.applications.values;
+                                return DesktopEntries.applications.values
                             }
-                            
+
                             return DesktopEntries.applications.values.filter(app => {
-                                const ntxt = app.name.toLowerCase();
-                                let ni = 0;
-                                for (let si = 0; si < stxt.length; ++si) {
-                                    const sc = stxt[si];
-                                    while (ni < ntxt.length) {
-                                        if (ntxt[ni++] == sc) break;
-                                        if (ni == ntxt.length) return false;
-                                    }
-                                }
-                                return true;
-                            });
+                                                                                 const ntxt = app.name.toLowerCase()
+                                                                                 let ni = 0
+                                                                                 for (var si = 0; si < stxt.length; ++si) {
+                                                                                     const sc = stxt[si]
+                                                                                     while (ni < ntxt.length) {
+                                                                                         if (ntxt[ni++] == sc)
+                                                                                         break
+                                                                                         if (ni == ntxt.length)
+                                                                                         return false
+                                                                                     }
+                                                                                 }
+                                                                                 return true
+                                                                             })
                         }
-Rectangle {
-    id: glassArc
-    anchors.centerIn: parent
-    anchors.horizontalCenterOffset: -carousel.arcRadius * 0.85
-    width: (carousel.arcRadius + 50) * 2
-    height: (carousel.arcRadius + 50) * 2
-    radius: carousel.arcRadius + 30
-    z: -1
-    
-    color: Qt.rgba(15/255, 15/255, 15/255, 0.4)
-}
+                        Rectangle {
+                            id: glassArc
+                            anchors.centerIn: parent
+                            anchors.horizontalCenterOffset: -carousel.arcRadius * 0.85
+                            width: (carousel.arcRadius + 50) * 2
+                            height: (carousel.arcRadius + 50) * 2
+                            radius: carousel.arcRadius + 30
+                            z: -1
+
+                            color: Qt.rgba(15 / 255, 15 / 255, 15 / 255, 0.4)
+                        }
                         MouseArea {
                             anchors.fill: parent
                             propagateComposedEvents: true
                             hoverEnabled: true
-                            
+
                             onWheel: wheel => {
-                                if (wheel.angleDelta.y > 0) {
-                                    carousel.currentIndex = Math.max(0, carousel.currentIndex - 1)
-                                } else {
-                                    carousel.currentIndex = Math.min(carousel.filteredApps.length - 1, carousel.currentIndex + 1)
-                                }
-                                wheel.accepted = true
-                            }
+                                         if (wheel.angleDelta.y > 0) {
+                                             carousel.currentIndex = Math.max(0, carousel.currentIndex - 1)
+                                         } else {
+                                             carousel.currentIndex = Math.min(carousel.filteredApps.length - 1, carousel.currentIndex + 1)
+                                         }
+                                         wheel.accepted = true
+                                     }
                         }
 
                         Repeater {
                             model: carousel.filteredApps
-                            
+
                             Item {
                                 id: appDelegate
-                                
+
                                 required property var modelData
                                 required property int index
-                                
+
                                 property int relativePos: index - carousel.currentIndex
                                 visible: Math.abs(relativePos) <= 1
-                                
+
                                 property real angle: relativePos * carousel.arcAngleSpan
                                 property real angleRad: angle * Math.PI / 180
-                                
+
                                 x: 120 - (1 - Math.cos(angleRad)) * carousel.arcRadius * 0.3
                                 y: carousel.height / 2 + Math.sin(angleRad) * carousel.arcRadius - 45
-                                
-                                Behavior on x { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-                                Behavior on y { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-                                
+
+                                Behavior on x {
+                                    NumberAnimation {
+                                        duration: 200
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
+                                Behavior on y {
+                                    NumberAnimation {
+                                        duration: 200
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
+
                                 width: 80
                                 height: 80
-                                
+
                                 property bool isHovered: false
                                 property bool isCenter: relativePos === 0
                                 property real baseScale: isCenter ? 1.3 : 0.85
@@ -183,7 +200,7 @@ Rectangle {
                                     radius: 35
                                     color: "transparent"
                                     z: 0
-                                    
+
                                     Rectangle {
                                         anchors.fill: parent
                                         anchors.margins: -8
@@ -205,21 +222,33 @@ Rectangle {
                                         color: "#40000000"
                                         z: -1
                                     }
-                                    
+
                                     transform: Scale {
                                         origin.x: dropShadow.width / 2
                                         origin.y: dropShadow.height / 2
                                         xScale: appDelegate.baseScale * appDelegate.hoverScale
                                         yScale: appDelegate.baseScale * appDelegate.hoverScale
-                                        
-                                        Behavior on xScale { NumberAnimation { duration: 150 } }
-                                        Behavior on yScale { NumberAnimation { duration: 150 } }
+
+                                        Behavior on xScale {
+                                            NumberAnimation {
+                                                duration: 150
+                                            }
+                                        }
+                                        Behavior on yScale {
+                                            NumberAnimation {
+                                                duration: 150
+                                            }
+                                        }
                                     }
-                                    
+
                                     rotation: appDelegate.isCenter ? +5 : appDelegate.angle * 1.5
-                                    Behavior on rotation { NumberAnimation { duration: 200 } }
+                                    Behavior on rotation {
+                                        NumberAnimation {
+                                            duration: 200
+                                        }
+                                    }
                                 }
-                                
+
                                 Rectangle {
                                     id: appButton
                                     anchors.centerIn: parent
@@ -229,20 +258,32 @@ Rectangle {
                                     radius: 30
                                     opacity: appDelegate.isCenter ? 1.0 : 0.8
                                     z: 1
-                                    
+
                                     transform: Scale {
                                         origin.x: appButton.width / 2
                                         origin.y: appButton.height / 2
                                         xScale: appDelegate.baseScale * appDelegate.hoverScale
                                         yScale: appDelegate.baseScale * appDelegate.hoverScale
-                                        
-                                        Behavior on xScale { NumberAnimation { duration: 150 } }
-                                        Behavior on yScale { NumberAnimation { duration: 150 } }
+
+                                        Behavior on xScale {
+                                            NumberAnimation {
+                                                duration: 150
+                                            }
+                                        }
+                                        Behavior on yScale {
+                                            NumberAnimation {
+                                                duration: 150
+                                            }
+                                        }
                                     }
-                                    
+
                                     rotation: appDelegate.isCenter ? +5 : appDelegate.angle * 1.5
-                                    Behavior on rotation { NumberAnimation { duration: 200 } }
-                                    
+                                    Behavior on rotation {
+                                        NumberAnimation {
+                                            duration: 200
+                                        }
+                                    }
+
                                     Rectangle {
                                         id: fallbackBg
                                         anchors.fill: parent
@@ -250,7 +291,7 @@ Rectangle {
                                         visible: appIcon.status !== Image.Ready
                                         color: colors.color2
                                         z: 1
-                                        
+
                                         Text {
                                             anchors.centerIn: parent
                                             text: appDelegate.modelData.name ? appDelegate.modelData.name.charAt(0).toUpperCase() : "?"
@@ -273,41 +314,43 @@ Rectangle {
                                         smooth: true
                                         z: 2
                                     }
-                                    
+
                                     MouseArea {
                                         id: appMouseArea
                                         anchors.fill: parent
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
-                                        
+
                                         property bool isClicking: false
-                                        
+
                                         onClicked: {
-                                            if (isClicking) return
+                                            if (isClicking)
+                                                return
                                             isClicking = true
-                                            
+
                                             clickAnimation.start()
-                                            Qt.callLater(function() {
+                                            Qt.callLater(function () {
                                                 appDelegate.modelData.execute()
-                                                if (root.forcedOpen) root.forcedOpen = false
+                                                if (root.forcedOpen)
+                                                    root.forcedOpen = false
                                                 isClicking = false
                                             })
                                         }
-                                        
+
                                         onEntered: {
                                             if (!isClicking) {
                                                 appDelegate.isHovered = true
                                                 carousel.currentIndex = appDelegate.index
                                             }
                                         }
-                                        
+
                                         onExited: {
                                             if (!isClicking) {
                                                 appDelegate.isHovered = false
                                             }
                                         }
                                     }
-                                    
+
                                     SequentialAnimation {
                                         id: clickAnimation
                                         NumberAnimation {
@@ -326,7 +369,7 @@ Rectangle {
                                         }
                                     }
                                 }
-                                
+
                                 Rectangle {
                                     visible: appDelegate.isCenter
                                     color: colors.color9
@@ -335,13 +378,13 @@ Rectangle {
                                     height: tooltipText.height + 10
                                     z: 10
                                     rotation: -2
-                                    
+
                                     anchors {
                                         left: parent.right
                                         leftMargin: 45
                                         verticalCenter: parent.verticalCenter
                                     }
-                                    
+
                                     Text {
                                         id: tooltipText
                                         anchors.centerIn: parent
@@ -360,10 +403,10 @@ Rectangle {
                         implicitWidth: 0
                         implicitHeight: 0
                         visible: false
-                        color:"transparent"
-                        border.width:3
+                        color: "transparent"
+                        border.width: 3
                         radius: 3
-                        border.color:colors.color3
+                        border.color: colors.color3
 
                         RowLayout {
                             id: searchbox
@@ -372,7 +415,7 @@ Rectangle {
 
                             IconImage {
                                 implicitSize: parent.height
-                                source: "root:icons/magnifying-glass.svg" 
+                                source: "root:icons/magnifying-glass.svg"
                             }
 
                             TextInput {
@@ -382,36 +425,38 @@ Rectangle {
 
                                 focus: true
                                 Keys.onEscapePressed: {
-                                     if (root.forcedOpen) root.forcedOpen = false
+                                    if (root.forcedOpen)
+                                        root.forcedOpen = false
                                 }
 
                                 Keys.onPressed: event => {
-                                    if (event.key == Qt.Key_Left || event.key == Qt.Key_Up) {
-                                        carousel.currentIndex = carousel.currentIndex == 0 ? carousel.filteredApps.length - 1 : carousel.currentIndex - 1;
-                                        event.accepted = true;
-                                    } else if (event.key == Qt.Key_Right || event.key == Qt.Key_Down) {
-                                        carousel.currentIndex = carousel.currentIndex == carousel.filteredApps.length - 1 ? 0 : carousel.currentIndex + 1;
-                                        event.accepted = true;
-                                    } else if (event.modifiers & Qt.ControlModifier) {
-                                        if (event.key == Qt.Key_J) {
-                                            carousel.currentIndex = carousel.currentIndex == carousel.filteredApps.length - 1 ? 0 : carousel.currentIndex + 1;
-                                            event.accepted = true;
-                                        } else if (event.key == Qt.Key_K) {
-                                            carousel.currentIndex = carousel.currentIndex == 0 ? carousel.filteredApps.length - 1 : carousel.currentIndex - 1;
-                                            event.accepted = true;
-                                        }
-                                    }
-                                }
+                                                    if (event.key == Qt.Key_Left || event.key == Qt.Key_Up) {
+                                                        carousel.currentIndex = carousel.currentIndex == 0 ? carousel.filteredApps.length - 1 : carousel.currentIndex - 1
+                                                        event.accepted = true
+                                                    } else if (event.key == Qt.Key_Right || event.key == Qt.Key_Down) {
+                                                        carousel.currentIndex = carousel.currentIndex == carousel.filteredApps.length - 1 ? 0 : carousel.currentIndex + 1
+                                                        event.accepted = true
+                                                    } else if (event.modifiers & Qt.ControlModifier) {
+                                                        if (event.key == Qt.Key_J) {
+                                                            carousel.currentIndex = carousel.currentIndex == carousel.filteredApps.length - 1 ? 0 : carousel.currentIndex + 1
+                                                            event.accepted = true
+                                                        } else if (event.key == Qt.Key_K) {
+                                                            carousel.currentIndex = carousel.currentIndex == 0 ? carousel.filteredApps.length - 1 : carousel.currentIndex - 1
+                                                            event.accepted = true
+                                                        }
+                                                    }
+                                                }
 
                                 onAccepted: {
                                     if (carousel.filteredApps.length > 0 && carousel.currentIndex >= 0 && carousel.currentIndex < carousel.filteredApps.length) {
-                                        carousel.filteredApps[carousel.currentIndex].execute();
-                                        if (root.forcedOpen) root.forcedOpen = false;
+                                        carousel.filteredApps[carousel.currentIndex].execute()
+                                        if (root.forcedOpen)
+                                            root.forcedOpen = false
                                     }
                                 }
 
                                 onTextChanged: {
-                                    carousel.currentIndex = 0;
+                                    carousel.currentIndex = 0
                                 }
                             }
                         }

@@ -1,4 +1,5 @@
 import QtQuick
+
 Item {
     id: root
 
@@ -59,8 +60,8 @@ Item {
 
         ScriptAction {
             script: {
-                text1.x = 0;
-                text2.x = text1.paintedWidth + spaceMeasure.width;
+                text1.x = 0
+                text2.x = text1.paintedWidth + spaceMeasure.width
             }
         }
     }
@@ -69,21 +70,21 @@ Item {
         target: text1
         function onXChanged() {
             if (scrollAnim.running)
-                text2.x = text1.x + text1.paintedWidth + spaceMeasure.width;
+                text2.x = text1.x + text1.paintedWidth + spaceMeasure.width
         }
     }
 
     function restartAnimation() {
-        scrollAnim.stop();
+        scrollAnim.stop()
 
         if (text1.paintedWidth > root.maxWidth) {
-            text1.x = 0;
-            text2.x = text1.paintedWidth + spaceMeasure.width;
-            text2.visible = true;
-            scrollAnim.start();
+            text1.x = 0
+            text2.x = text1.paintedWidth + spaceMeasure.width
+            text2.visible = true
+            scrollAnim.start()
         } else {
-            text1.x = 0;
-            text2.visible = false;
+            text1.x = 0
+            text2.visible = false
         }
     }
 

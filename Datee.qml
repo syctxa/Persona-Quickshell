@@ -9,9 +9,11 @@ import Quickshell.Hyprland
 import "." as Local
 
 ShellRoot {
-    Colors { id: colors }
+    Colors {
+        id: colors
+    }
 
-    Variants{
+    Variants {
         model: Quickshell.screens
 
         PanelWindow {
@@ -21,7 +23,7 @@ ShellRoot {
                 top: true
                 right: true
                 left: true
-                bottom:true
+                bottom: true
             }
             required property var modelData
             screen: modelData
@@ -68,7 +70,7 @@ ShellRoot {
 
             Item {
                 anchors.left: parent.horizontalCenter
-                anchors.leftMargin: parent.width * 0.42  // 40% from center to the right
+                anchors.leftMargin: parent.width * 0.42 // 40% from center to the right
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: -430
 
@@ -86,9 +88,9 @@ ShellRoot {
                             ctx.clearRect(0, 0, width, height)
                             ctx.fillStyle = "black"
                             ctx.beginPath()
-                            ctx.moveTo(width / 2, height)      // Bottom point (tip)
-                            ctx.lineTo(0, 0)                   // Top left
-                            ctx.lineTo(width, 0)               // Top right
+                            ctx.moveTo(width / 2, height) // Bottom point (tip)
+                            ctx.lineTo(0, 0) // Top left
+                            ctx.lineTo(width, 0) // Top right
                             ctx.closePath()
                             ctx.fill()
                         }
@@ -98,19 +100,19 @@ ShellRoot {
                         width: dayText.implicitWidth
                         height: dayText.implicitHeight
                         Text {
-                          id: dayText
-                          anchors.centerIn: parent
-                          anchors.verticalCenterOffset: -79
-                          text: clock.date.toLocaleString(Qt.locale("en_US"), "ddd")
-                          font.family: "Linux Biolinum"
-                          font.bold: true
-                          font.pixelSize: 25
-                          color: "white"
-                          font.letterSpacing: -2
-                          transform: Scale {
-                              yScale: 2.0
-                              xScale: 1.0
-                          }
+                            id: dayText
+                            anchors.centerIn: parent
+                            anchors.verticalCenterOffset: -79
+                            text: clock.date.toLocaleString(Qt.locale("en_US"), "ddd")
+                            font.family: "Linux Biolinum"
+                            font.bold: true
+                            font.pixelSize: 25
+                            color: "white"
+                            font.letterSpacing: -2
+                            transform: Scale {
+                                yScale: 2.0
+                                xScale: 1.0
+                            }
                         }
                     }
                 }

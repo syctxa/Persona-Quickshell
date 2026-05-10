@@ -1,4 +1,3 @@
-
 import QtQuick
 
 QtObject {
@@ -6,7 +5,7 @@ QtObject {
     readonly property string background: "#0c0f1d"
     readonly property string foreground: "#c2c3c6"
     readonly property string cursor: "#c2c3c6"
-    
+
     // Standard 16 colors
     readonly property string color0: "#0c0f1d"
     readonly property string color1: "#1788B6"
@@ -24,7 +23,7 @@ QtObject {
     readonly property string color13: "#1CC9D9"
     readonly property string color14: "#5FCFDF"
     readonly property string color15: "#c2c3c6"
-    
+
     // Named aliases for convenience
     readonly property string black: color0
     readonly property string red: color1
@@ -34,7 +33,7 @@ QtObject {
     readonly property string magenta: color5
     readonly property string cyan: color6
     readonly property string white: color7
-    
+
     readonly property string brightBlack: color8
     readonly property string brightRed: color9
     readonly property string brightGreen: color10

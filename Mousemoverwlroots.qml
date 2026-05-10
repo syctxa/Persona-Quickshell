@@ -6,7 +6,6 @@ import "."
 Scope {
     id: root
     property bool shouldShow: false
-    
 
     property int workspacesShown: 9
     property int columns: 3
@@ -15,17 +14,21 @@ Scope {
     property real workspaceHeight: 150
     property real workspaceSpacing: 14
 
-
     readonly property var jpN: ({
-        1: "一", 2: "二", 3: "三", 4: "四", 5: "五",
-        6: "六", 7: "七", 8: "八", 9: "九"
-    })
-
+                                    "1": "一",
+                                    "2": "二",
+                                    "3": "三",
+                                    "4": "四",
+                                    "5": "五",
+                                    "6": "六",
+                                    "7": "七",
+                                    "8": "八",
+                                    "9": "九"
+                                })
 
     property int draggingFromWorkspace: -1
     property int draggingTargetWorkspace: -1
     property bool isDraggingToClose: false
-
 
     property var windowList: DwlWindows.windowList
 
@@ -35,7 +38,6 @@ Scope {
             DwlService.getTagState()
         }
     }
-
 
     Connections {
         target: DwlWindows
@@ -50,24 +52,23 @@ Scope {
 
     Variants {
         model: Quickshell.screens
-        
+
         LazyLoader {
             id: lazyLoader
             required property var modelData
             active: root.shouldShow
-            
+
             PanelWindow {
                 id: overviewWindow
                 visible: root.shouldShow
                 screen: lazyLoader.modelData
-                
 
                 readonly property string outputName: lazyLoader.modelData.name
                 property int activeTagIndex: 0
 
-
                 function updateActiveTag() {
-                    if (!DwlService.dwlAvailable) return
+                    if (!DwlService.dwlAvailable)
+                        return
                     let activeTags = DwlService.getActiveTags(overviewWindow.outputName)
                     overviewWindow.activeTagIndex = activeTags.length > 0 ? activeTags[0] : 0
                 }
@@ -80,7 +81,7 @@ Scope {
                         overviewWindow.updateActiveTag()
                     }
                 }
-                
+
                 anchors {
                     top: true
                     bottom: true
@@ -88,7 +89,7 @@ Scope {
                     right: true
                 }
                 color: "transparent"
-                
+
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
                 WlrLayershell.exclusionMode: ExclusionMode.Ignore
@@ -96,12 +97,11 @@ Scope {
                 Rectangle {
                     anchors.fill: parent
                     color: "#CC000000"
-                    
+
                     MouseArea {
                         anchors.fill: parent
                         onClicked: root.shouldShow = false
                     }
-                    
 
                     Item {
                         id: workspaceContainer
@@ -119,19 +119,19 @@ Scope {
                                 readonly property int tagIndex: index
                                 readonly property int col: index % root.columns
                                 readonly property int row: Math.floor(index / root.columns)
-                                
+
                                 readonly property bool isActive: overviewWindow.activeTagIndex === tagIndex
-                                
 
                                 readonly property int clientCount: {
-                                    if (!DwlService.dwlAvailable) return 0
+                                    if (!DwlService.dwlAvailable)
+                                        return 0
                                     let state = DwlService.getOutputState(overviewWindow.outputName)
                                     if (state && state.tags && state.tags[tagIndex]) {
                                         return state.tags[tagIndex].clients || 0
                                     }
                                     return 0
                                 }
-                                
+
                                 property bool isDropTarget: false
 
                                 x: col * (root.workspaceWidth + root.workspaceSpacing)
@@ -143,8 +143,12 @@ Scope {
                                 radius: 12
                                 border.width: isActive ? 2 : (clientCount > 0 ? 1 : 0)
                                 border.color: isActive ? "#FF00FF" : (clientCount > 0 ? "#40FFFFFF" : "transparent")
-                                
-                                Behavior on color { ColorAnimation { duration: 200 } }
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: 200
+                                    }
+                                }
 
                                 Text {
                                     anchors.centerIn: parent
@@ -164,9 +168,9 @@ Scope {
                                     font.pixelSize: 13
                                     opacity: 0.4
                                 }
-                                
-                                property int visualWindowCount: 0 
-                                
+
+                                property int visualWindowCount: 0
+
                                 Text {
                                     anchors.left: parent.left
                                     anchors.bottom: parent.bottom
@@ -178,19 +182,16 @@ Scope {
                                     visible: workspaceRect.clientCount > workspaceRect.visualWindowCount
                                 }
 
-
-
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
-                                    z: 100 
+                                    z: 100
                                     onClicked: {
                                         console.log("Switching " + overviewWindow.outputName + " to tag " + workspaceRect.tagIndex)
                                         DwlService.switchToTag(overviewWindow.outputName, workspaceRect.tagIndex)
-
                                     }
                                 }
-                                
+
                                 DropArea {
                                     anchors.fill: parent
                                     keys: ["window"]
@@ -198,16 +199,17 @@ Scope {
                                     onEntered: {
                                         root.draggingTargetWorkspace = workspaceRect.tagIndex
                                         root.isDraggingToClose = false
-                                        if (root.draggingFromWorkspace !== workspaceRect.tagIndex) workspaceRect.isDropTarget = true
+                                        if (root.draggingFromWorkspace !== workspaceRect.tagIndex)
+                                            workspaceRect.isDropTarget = true
                                     }
                                     onExited: {
                                         workspaceRect.isDropTarget = false
-                                        if (root.draggingTargetWorkspace === workspaceRect.tagIndex) root.draggingTargetWorkspace = -1
+                                        if (root.draggingTargetWorkspace === workspaceRect.tagIndex)
+                                            root.draggingTargetWorkspace = -1
                                     }
                                 }
                             }
                         }
-
 
                         Repeater {
                             model: root.windowList
@@ -215,13 +217,11 @@ Scope {
                                 id: windowItem
                                 required property var modelData
                                 required property int index
-                                
 
                                 readonly property bool isOnThisMonitor: modelData.monitorName === overviewWindow.outputName
                                 readonly property int windowTagIndex: modelData.tagIndex
-                                
+
                                 visible: isOnThisMonitor && windowTagIndex >= 0 && windowTagIndex < root.workspacesShown
-                                
 
                                 readonly property int col: windowTagIndex % root.columns
                                 readonly property int row: Math.floor(windowTagIndex / root.columns)
@@ -230,7 +230,7 @@ Scope {
 
                                 readonly property int windowsInSameTag: {
                                     let count = 0
-                                    for (let i = 0; i < index; i++) {
+                                    for (var i = 0; i < index; i++) {
                                         let w = root.windowList[i]
                                         if (w && w.monitorName === overviewWindow.outputName && w.tagIndex === windowTagIndex) {
                                             count++
@@ -238,7 +238,7 @@ Scope {
                                     }
                                     return count
                                 }
-                                
+
                                 readonly property int gridCol: windowsInSameTag % 3
                                 readonly property int gridRow: Math.floor(windowsInSameTag / 3)
                                 readonly property real offsetX: 10 + gridCol * (83)
@@ -248,14 +248,17 @@ Scope {
                                 readonly property real targetY: baseY + offsetY
 
                                 property bool isDragging: false
-                                
-                                x: targetX; y: targetY
-                                width: 75; height: 55
+
+                                x: targetX
+                                y: targetY
+                                width: 75
+                                height: 55
                                 z: isDragging ? 200 : 5
 
                                 Drag.active: dragArea.drag.active
                                 Drag.keys: ["window"]
-                                Drag.hotSpot.x: width/2; Drag.hotSpot.y: height/2
+                                Drag.hotSpot.x: width / 2
+                                Drag.hotSpot.y: height / 2
 
                                 Rectangle {
                                     anchors.fill: parent
@@ -263,10 +266,10 @@ Scope {
                                     radius: 8
                                     border.width: windowItem.isDragging ? 2 : 0
                                     border.color: root.isDraggingToClose ? "#FF4444" : "#FF00FF"
-                                    
+
                                     Text {
                                         anchors.centerIn: parent
-                                        text: (windowItem.modelData.appId || "App").substring(0,8)
+                                        text: (windowItem.modelData.appId || "App").substring(0, 8)
                                         color: "white"
                                         font.pixelSize: 10
                                     }
@@ -278,24 +281,25 @@ Scope {
                                     drag.target: parent
 
                                     propagateComposedEvents: false
-                                    
+
                                     onPressed: {
                                         windowItem.isDragging = true
                                         root.draggingFromWorkspace = windowItem.windowTagIndex
 
-                                        if (windowItem.modelData.toplevel) windowItem.modelData.toplevel.activate()
+                                        if (windowItem.modelData.toplevel)
+                                            windowItem.modelData.toplevel.activate()
                                     }
-                                    
+
                                     onClicked: {
 
-                                         if (windowItem.modelData.toplevel) {
+                                        if (windowItem.modelData.toplevel) {
 
-                                             DwlService.switchToTag(overviewWindow.outputName, windowItem.windowTagIndex)
+                                            DwlService.switchToTag(overviewWindow.outputName, windowItem.windowTagIndex)
 
-                                             windowItem.modelData.toplevel.activate()
+                                            windowItem.modelData.toplevel.activate()
 
-                                             root.shouldShow = false
-                                         }
+                                            root.shouldShow = false
+                                        }
                                     }
 
                                     onReleased: {
@@ -303,7 +307,7 @@ Scope {
                                         windowItem.isDragging = false
                                         root.draggingFromWorkspace = -1
                                         root.draggingTargetWorkspace = -1
-                                        
+
                                         if (root.isDraggingToClose) {
                                             DwlWindows.closeWindow(windowItem.modelData.toplevel)
                                         } else if (target !== -1) {

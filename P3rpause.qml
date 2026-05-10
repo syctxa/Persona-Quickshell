@@ -8,49 +8,42 @@ Scope {
     id: root
     property bool shouldShow: false
     property var targetScreen: null
-    Colors { id: colors }
-    
+    Colors {
+        id: colors
+    }
 
     Process {
         id: poweroffProcess
         command: ["loginctl", "poweroff"]
         running: false
     }
-    
 
     Process {
         id: restartProcess
         command: ["loginctl", "reboot"]
         running: false
     }
-    
 
     Process {
         id: logoutProcess
         command: ["loginctl", "terminate-session", "self"]
         running: false
     }
-    
 
     property var preloadedImages: []
     Component.onCompleted: {
 
-    for (var i = 0; i < 12; i++) {
-        var img = Qt.createQmlObject('import QtQuick; Image { visible: false; source: "' + 
-            Qt.resolvedUrl("assets/p3r menu/png/pngseq" + String(i).padStart(2, '0') + ".png") + '" }', root)
-        preloadedImages.push(img)
-    }
-    
+        for (var i = 0; i < 12; i++) {
+            var img = Qt.createQmlObject('import QtQuick; Image { visible: false; source: "' + Qt.resolvedUrl("assets/p3r menu/png/pngseq" + String(i).padStart(2, '0') + ".png") + '" }', root)
+            preloadedImages.push(img)
+        }
 
-    var video1 = Qt.createQmlObject('import QtQuick; import QtMultimedia; Video { visible: false; source: "' + 
-        Qt.resolvedUrl("assets/p3r menu/part2.mp4") + '" }', root)
-    var video2 = Qt.createQmlObject('import QtQuick; import QtMultimedia; Video { visible: false; source: "' + 
-        Qt.resolvedUrl("assets/p3r menu/part3.mp4") + '" }', root)
-    
-    preloadedImages.push(video1)
-    preloadedImages.push(video2)
-}
-    
+        var video1 = Qt.createQmlObject('import QtQuick; import QtMultimedia; Video { visible: false; source: "' + Qt.resolvedUrl("assets/p3r menu/part2.mp4") + '" }', root)
+        var video2 = Qt.createQmlObject('import QtQuick; import QtMultimedia; Video { visible: false; source: "' + Qt.resolvedUrl("assets/p3r menu/part3.mp4") + '" }', root)
+
+        preloadedImages.push(video1)
+        preloadedImages.push(video2)
+    }
 
     function cleanup() {
         for (var i = 0; i < preloadedImages.length; i++) {
@@ -60,64 +53,58 @@ Scope {
         }
         preloadedImages = []
     }
-    
 
     LazyLoader {
         active: true
-        
+
         PanelWindow {
             id: p3rpauseWindow
             visible: root.shouldShow
             screen: root.targetScreen
             color: "transparent"
             onVisibleChanged: {
-              if (visible) {
-              overlay.resetMenu()
+                if (visible) {
+                    overlay.resetMenu()
                 }
-              }
+            }
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusionMode: ExclusionMode.Normal
-            
+
             anchors {
                 right: true
                 left: true
                 top: true
                 bottom: true
             }
-            
+
             Rectangle {
                 id: overlay
                 anchors.fill: parent
                 color: "transparent"
-                
 
                 property int stage: 0
-                
 
                 transform: Translate {
                     id: slideTransform
                     y: 0
-                  }
+                }
 
                 function resetMenu() {
 
                     overlay.stage = 0
                     overlay.opacity = 1
                     slideTransform.y = 0
-                    
 
                     pngSequence.currentFrame = 0
                     pngSequence.visible = true
-                    
 
                     part2Video.stop()
                     part2Video.visible = false
                     part2Video.seek(0)
-                    
+
                     part3Video.stop()
                     part3Video.visible = false
                     part3Video.seek(0)
-                    
 
                     part2Video.play()
                     part2Video.pause()
@@ -125,16 +112,14 @@ Scope {
                     part3Video.play()
                     part3Video.pause()
                     part3Video.seek(0)
-                    
 
                     frameAnimation.start()
                 }
-                
 
                 ParallelAnimation {
                     id: hideAnimation
                     running: false
-                    
+
                     NumberAnimation {
                         target: slideTransform
                         property: "y"
@@ -143,7 +128,7 @@ Scope {
                         duration: 300
                         easing.type: Easing.InCubic
                     }
-                    
+
                     NumberAnimation {
                         target: overlay
                         property: "opacity"
@@ -152,38 +137,37 @@ Scope {
                         duration: 300
                         easing.type: Easing.InCubic
                     }
-                    
+
                     onFinished: {
                         frameAnimation.stop()
                         destroyTimer.start()
                     }
                 }
-                
-                    Timer {
-                        id: destroyTimer
-                        interval: 10
-                        repeat: false
-                        onTriggered: {
-                            root.shouldShow = false
 
-                            overlay.stage = 0
-                            pngSequence.currentFrame = 0
-                        }
+                Timer {
+                    id: destroyTimer
+                    interval: 10
+                    repeat: false
+                    onTriggered: {
+                        root.shouldShow = false
+
+                        overlay.stage = 0
+                        pngSequence.currentFrame = 0
                     }
-                
-                    Component.onCompleted: {
+                }
 
-                        part2Video.play()
-                        part2Video.pause()
-                        part2Video.seek(0)
-                        part3Video.play()
-                        part3Video.pause()
-                        part3Video.seek(0)
+                Component.onCompleted: {
 
-                        pngSequence.visible = true
-                        frameAnimation.start()
-                    }
-                
+                    part2Video.play()
+                    part2Video.pause()
+                    part2Video.seek(0)
+                    part3Video.play()
+                    part3Video.pause()
+                    part3Video.seek(0)
+
+                    pngSequence.visible = true
+                    frameAnimation.start()
+                }
 
                 Image {
                     id: pngSequence
@@ -192,19 +176,19 @@ Scope {
                     visible: true
                     cache: true
                     asynchronous: false
-                    
-                    property int currentFrame: 0  
+
+                    property int currentFrame: 0
                     property int totalFrames: 12
                     property int frameRate: 60
-                    
+
                     source: Qt.resolvedUrl("assets/p3r menu/png/pngseq" + String(currentFrame).padStart(2, '0') + ".png")
-                    
+
                     Timer {
                         id: frameAnimation
                         interval: 1000 / pngSequence.frameRate
                         repeat: true
                         running: false
-                        
+
                         onTriggered: {
                             if (pngSequence.currentFrame < pngSequence.totalFrames - 1) {
                                 pngSequence.currentFrame++
@@ -218,7 +202,6 @@ Scope {
                         }
                     }
                 }
-                
 
                 Video {
                     id: part2Video
@@ -227,7 +210,7 @@ Scope {
                     fillMode: VideoOutput.PreserveAspectCrop
                     volume: 0
                     visible: false
-                    
+
                     onPositionChanged: {
                         if (duration > 0 && position >= duration - 50 && overlay.stage === 1) {
                             part2Video.visible = false
@@ -236,7 +219,7 @@ Scope {
                             part3Video.play()
                         }
                     }
-                    
+
                     onPlaybackStateChanged: {
                         if (playbackState === MediaPlayer.StoppedState && overlay.stage === 1) {
                             part2Video.visible = false
@@ -246,7 +229,6 @@ Scope {
                         }
                     }
                 }
-                
 
                 Video {
                     id: part3Video
@@ -257,7 +239,6 @@ Scope {
                     volume: 0
                     visible: false
                 }
-                
 
                 Item {
                     id: powerOptionsContainer
@@ -268,7 +249,6 @@ Scope {
                     height: 500
                     visible: overlay.stage >= 1
                     z: 10
-                    
 
                     Item {
                         id: poweroffItem
@@ -280,21 +260,23 @@ Scope {
                         property bool hovered: false
                         scale: hovered ? 1.1 : 1.0
                         transformOrigin: Item.Center
-                        
+
                         Behavior on scale {
-                            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                            NumberAnimation {
+                                duration: 200
+                                easing.type: Easing.OutCubic
+                            }
                         }
-                        
+
                         MouseArea {
-                          anchors.centerIn: parent
-                          width: parent.width * 0.4
-                          height: parent.height * 0.4
-                          hoverEnabled: true
-                          onEntered: parent.hovered = true
-                          onExited: parent.hovered = false
-                          onClicked: poweroffProcess.running = true
+                            anchors.centerIn: parent
+                            width: parent.width * 0.4
+                            height: parent.height * 0.4
+                            hoverEnabled: true
+                            onEntered: parent.hovered = true
+                            onExited: parent.hovered = false
+                            onClicked: poweroffProcess.running = true
                         }
-                        
 
                         Image {
                             anchors.fill: parent
@@ -302,7 +284,6 @@ Scope {
                             source: poweroffItem.hovered ? Qt.resolvedUrl("assets/iconpack/shutdown1.png") : Qt.resolvedUrl("assets/iconpack/shutdown.png")
                         }
                     }
-                    
 
                     Item {
                         id: restartItem
@@ -314,11 +295,14 @@ Scope {
                         property bool hovered: false
                         scale: hovered ? 1.1 : 1.0
                         transformOrigin: Item.Center
-                        
+
                         Behavior on scale {
-                            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                            NumberAnimation {
+                                duration: 200
+                                easing.type: Easing.OutCubic
+                            }
                         }
-                        
+
                         MouseArea {
                             anchors.centerIn: parent
                             hoverEnabled: true
@@ -328,7 +312,6 @@ Scope {
                             onExited: parent.hovered = false
                             onClicked: restartProcess.running = true
                         }
-                        
 
                         Image {
                             anchors.fill: parent
@@ -336,7 +319,6 @@ Scope {
                             source: restartItem.hovered ? Qt.resolvedUrl("assets/iconpack/restart1.png") : Qt.resolvedUrl("assets/iconpack/restart.png")
                         }
                     }
-                    
 
                     Item {
                         id: logoutItem
@@ -348,11 +330,14 @@ Scope {
                         property bool hovered: false
                         scale: hovered ? 1.1 : 1.0
                         transformOrigin: Item.Center
-                        
+
                         Behavior on scale {
-                            NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+                            NumberAnimation {
+                                duration: 200
+                                easing.type: Easing.OutCubic
+                            }
                         }
-                        
+
                         MouseArea {
                             anchors.centerIn: parent
                             hoverEnabled: true
@@ -362,7 +347,6 @@ Scope {
                             onExited: parent.hovered = false
                             onClicked: logoutProcess.running = true
                         }
-                        
 
                         Image {
                             anchors.fill: parent
@@ -372,32 +356,28 @@ Scope {
                     }
                 }
 
-                
-
                 FocusScope {
                     anchors.fill: parent
                     focus: true
-                    
+
                     MouseArea {
                         anchors.fill: parent
                         z: -1
                         onClicked: hideAnimation.start()
                     }
-                    
-                    Keys.onPressed: (event) => {
-                        if (event.key === Qt.Key_Escape) {
-                            hideAnimation.start()
-                            event.accepted = true
-                        }
-                    }
 
-                    
+                    Keys.onPressed: event => {
+                                        if (event.key === Qt.Key_Escape) {
+                                            hideAnimation.start()
+                                            event.accepted = true
+                                        }
+                                    }
+
                     Component.onCompleted: {
                         forceActiveFocus()
                     }
                 }
-
+            }
         }
-    }
     }
 }
