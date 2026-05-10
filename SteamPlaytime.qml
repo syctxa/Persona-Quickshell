@@ -18,7 +18,7 @@ QtObject {
     }
 
     property Process steamProcess: Process {
-        command: ["sh", "-c", "grep -w '\"Playtime2wks\"' ~/.steam/steam/userdata/1642239526/config/localconfig.vdf | tr -d '\"' | awk '{sum += $2} END {print sum/60}'"]
+        command: ["sh", "-c", "grep -w '\"Playtime2wks\"' ~/snap/steam/common/.local/share/Steam/userdata/1642239526/config/localconfig.vdf | tr -d '\"' | awk '{sum += $2} END {print sum/60}'"]
         stdout: SplitParser {
             onRead: data => {
                         let val = parseFloat(data.trim())
