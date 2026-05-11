@@ -7,7 +7,9 @@ import Quickshell.Wayland
 
 Scope {
     id: root
-    Colors { id: colors }
+    Colors {
+        id: colors
+    }
 
     property int brightness: 0
     property int current: -1
@@ -15,52 +17,69 @@ Scope {
     property bool shouldShowOsd: false
     property bool initialized: false
 
+    property string backlightDevice: ""
+
+    Process {
+        id: findBacklight
+        command: ["sh", "-c", "ls /sys/class/backlight | head -n 1"]
+        running: true
+        stdout: SplitParser {
+            onRead: data => {
+                        let device = data.trim()
+                        if (device) {
+                            root.backlightDevice = device
+                        }
+                    }
+        }
+    }
+
     Timer {
         id: updateTimer
         interval: 100
-        running: true
+        running: root.backlightDevice !== ""
         repeat: true
         triggeredOnStart: true
         onTriggered: {
             currentFile.reload()
-            maxFile.reload() 
+            maxFile.reload()
         }
     }
 
     FileView {
         id: currentFile
-        path: "/sys/class/backlight/nvidia_0/brightness"
+        path: root.backlightDevice ? "/sys/class/backlight/" + root.backlightDevice + "/brightness" : ""
         onLoaded: {
             var val = parseInt(text().trim())
-            if (isNaN(val)) return;
+            if (isNaN(val))
+                return
 
             if (root.current !== val) {
                 if (root.initialized && root.current !== -1) {
-                    root.shouldShowOsd = true;
-                    hideTimer.restart();
+                    root.shouldShowOsd = true
+                    hideTimer.restart()
                 }
-                root.current = val;
-                root.updateBrightness();
-                root.initialized = true;
+                root.current = val
+                root.updateBrightness()
+                root.initialized = true
             }
         }
     }
 
     FileView {
         id: maxFile
-        path: "/sys/class/backlight/nvidia_0/max_brightness"
+        path: root.backlightDevice ? "/sys/class/backlight/" + root.backlightDevice + "/max_brightness" : ""
         onLoaded: {
             var val = parseInt(text().trim())
-             if (!isNaN(val)) {
-                root.max = val;
-                root.updateBrightness();
+            if (!isNaN(val)) {
+                root.max = val
+                root.updateBrightness()
             }
         }
     }
 
     function updateBrightness() {
         if (root.max > 0 && root.current >= 0) {
-            root.brightness = Math.round((root.current / root.max) * 100);
+            root.brightness = Math.round((root.current / root.max) * 100)
         }
     }
 
@@ -133,4 +152,4 @@ Scope {
             }
         }
     }
-}
+}
