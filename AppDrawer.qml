@@ -10,12 +10,12 @@ Scope {
     Colors {
         id: colors
     }
-    Mousemover {
+    /*Mousemover {
         id: mousemover
     }
     Mousemoverwlroots {
-        id: mousemoverwlroots
-    }
+       id: mousemoverwlroots
+     }*/
     P3rpause {
         id: p3rpause
     }

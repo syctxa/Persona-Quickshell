@@ -6,6 +6,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 ShellRoot {
+      FontLoader { id: nerdFont; source: "./assets/fonts/3270NerdFont-Regular.ttf" }
     Colors {
         id: colors
     }
@@ -148,8 +149,9 @@ ShellRoot {
 
                             // Previous Button
                             Text {
-                                text: "󰼨"
-                                font.pixelSize: 25
+                              text: "󰼨"
+                              font.family: nerdFont.font.family
+                              font.pixelSize: 30
                                 color: prevMouse.containsMouse ? colors.color3 : colors.color15
                                 Behavior on color {
                                     ColorAnimation {
@@ -172,6 +174,7 @@ ShellRoot {
 
                             // Play/Pause Button
                             Text {
+                              font.family: nerdFont.font.family
                                 text: mpris && mpris.playbackState === MprisPlaybackState.Playing ? "󰏤" : ""
                                 font.pixelSize: 25
                                 color: playMouse.containsMouse ? colors.color3 : colors.color15
@@ -197,8 +200,9 @@ ShellRoot {
 
                             // Next Button
                             Text {
-                                text: "󰼧"
-                                font.pixelSize: 25
+                              text: "󰼧"
+                              font.family: nerdFont.font.family
+                              font.pixelSize: 30
                                 color: nextMouse.containsMouse ? "#40c0ff" : colors.color15
 
                                 Behavior on color {
