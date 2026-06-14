@@ -51,9 +51,7 @@ the power menu currently uses loginctl commands, feel free to change them to you
 # Credits
 
 Inspiration taken from:
-<https://github.com/RyuZinOh/.dotfiles>
-shader taken from:
-<https://github.com/eq-desktop/Vitreus>
+PERSONAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 #
 
