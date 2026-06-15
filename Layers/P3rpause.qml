@@ -77,7 +77,7 @@ Scope {
                     cache: true
                     asynchronous: false
                     property int currentFrame: 0
-                    property int totalFrames: 13
+                    property int totalFrames: 12
                     property int frameRate: 60
                     source: Qt.resolvedUrl("../Assets/p3r menu/png/pngseq" + String(currentFrame).padStart(2, '0') + ".png")
 

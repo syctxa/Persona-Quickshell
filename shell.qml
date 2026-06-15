@@ -19,7 +19,6 @@ ShellRoot {
     }
   }
   Lay.Capsule {}
-  //Lay.Triangle {}
   //Lay.Datee {}
   Lay.AppDrawer {}
   Lay.VolumeOsd {}

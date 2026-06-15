@@ -17,18 +17,18 @@ Item {
 
     readonly property var revealContent: [
         {
-            upper: ["Your Name", "Focus: AI Engineer"],
+            upper: ["Filter to reduce Bluelight"],
             lower: "blue light filter",
             portrait: Qt.resolvedUrl("../Assets/components/mainm.jpeg")
         },
         {
-            upper: ["Languages: Python, C++", "Core Stack: Python, NumPy, Pandas, PyTorch", "Learning: ML fundamentals"],
-            lower: "blue light filter",
+            upper: ["Black and white only" ],
+            lower: "grey scale filter",
             portrait: Qt.resolvedUrl("../Assets/components/mainm2.jpeg")
         },
         {
-            upper: ["Mathematics for Machine Learning", "Deep Learning Architectures", "Reinforcement Learning"],
-            lower: "greyscale mode",
+            upper: ["Invert all the colors cuz why not"],
+            lower: "inversion filter",
             portrait: Qt.resolvedUrl("../Assets/components/mainf.jpeg")
         },
     ]
@@ -40,37 +40,33 @@ Item {
         "/home/yujon/.config/hypr/Shaders/invert.glsl"
     ]
 
-    // shader applied when toggled off (restores default)
     readonly property string offShader: "/home/yujon/.config/hypr/Shaders/vibrant.glsl"
 
-    // per-tab toggle state
 
- function toggleShader(index) {
+    function toggleShader(index) {
         if (activeShaderIndex === index) {
-            // turning the current one off
-            activeShaderIndex = -1
-            const cmd = "hl.config({ decoration = { screen_shader = \"" + offShader + "\" } })"
-            shaderProc.command = ["hyprctl", "eval", cmd]
-            shaderProc.startDetached()
+        activeShaderIndex = -1
+        const cmd = "hl.config({ decoration = { screen_shader = \"" + offShader + "\" } })"
+        shaderProc.command = ["hyprctl", "eval", cmd]
+        shaderProc.startDetached()
         } else {
-            // switching to (or turning on) a different shader
-            activeShaderIndex = index
-            const shaderPath = shaderPaths[index]
-            const cmd = "hl.config({ decoration = { screen_shader = \"" + shaderPath + "\" } })"
-            shaderProc.command = ["hyprctl", "eval", cmd]
-            shaderProc.startDetached()
-        }
+        activeShaderIndex = index
+        const shaderPath = shaderPaths[index]
+        const cmd = "hl.config({ decoration = { screen_shader = \"" + shaderPath + "\" } })"
+        shaderProc.command = ["hyprctl", "eval", cmd]
+        shaderProc.startDetached()
+      }
     }
 
     Process {
-        id: shaderProc
-        stdout: SplitParser {
-            onRead: data => console.log("STDOUT:", data)
-        }
-        stderr: SplitParser {
-            onRead: data => console.log("STDERR:", data)
-        }
-        onExited: (code, status) => console.log("Exited:", code, status)
+      id: shaderProc
+      stdout: SplitParser {
+          onRead: data => console.log("STDOUT:", data)
+      }
+      stderr: SplitParser {
+          onRead: data => console.log("STDERR:", data)
+      }
+      onExited: (code, status) => console.log("Exited:", code, status)
     }
 
     // dim overlay
@@ -207,7 +203,7 @@ Item {
             spacing: 12
 
             Repeater {
-                model: ["ABOUT ME", "TECH STACK", "CURRENTLY LEARNING"]
+                model: ["Bluelight", "Greyscale", "Inversion"]
                 delegate: Item {
                     required property string modelData
                     required property int index
@@ -233,7 +229,6 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: parent.parent.modelData
-                            font.family: bebasNeue.name
                             font.pixelSize: 14
                             color: parent.parent.index === revealRoot.localTab ? "#111111" : "#66ffffff"
                             Behavior on color { ColorAnimation { duration: 150 } }

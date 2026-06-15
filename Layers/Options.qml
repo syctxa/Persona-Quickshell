@@ -9,9 +9,9 @@ Scope {
     property var targetScreen: null
 
     readonly property var barData: [
-        { role: "LEADER", label: "Option 1", char: Qt.resolvedUrl("../Assets/components/char1.png") },
-        { role: "PARTY",  label: "Option 2", char: Qt.resolvedUrl("../Assets/components/char2.png") },
-        { role: "PARTY",  label: "Option 3", char: Qt.resolvedUrl("../Assets/components/char3.png") },
+        { role: "LEADER", label: "Bluelight", char: Qt.resolvedUrl("../Assets/components/char1.png") },
+        { role: "PARTY",  label: "Greyscale", char: Qt.resolvedUrl("../Assets/components/char2.png") },
+        { role: "PARTY",  label: "Inversion", char: Qt.resolvedUrl("../Assets/components/char3.png") },
     ]
 
     LazyLoader {
@@ -257,11 +257,6 @@ Scope {
                     Behavior on opacity { NumberAnimation { duration: 400 } }
 
                     Repeater {
-                        model: [
-                            { key: "↑↓",  hint: "SELECT" },
-                            { key: "↵",   hint: "REVEAL" },
-                            { key: "ESC", hint: "BACK"   },
-                        ]
                         delegate: Row {
                             required property var modelData
                             spacing: 8
