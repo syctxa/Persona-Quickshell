@@ -60,10 +60,6 @@ Scope {
                 volume: 0
                 z: 0
             }
-
-            FontLoader { id: bebasNeue; source: Qt.resolvedUrl("../Assets/fonts/BebasNeue-Regular.ttf") }
-            FontLoader { id: montserrat; source: Qt.resolvedUrl("../Assets/fonts/Montserrat-Light.ttf") }
-
             Item {
                 id: contentRoot
                 anchors.fill: parent
@@ -75,7 +71,13 @@ Scope {
                     z: -1
                     onClicked: root.shouldShow = false
                 }
-
+              OptionsList {
+                  anchors.fill: parent
+                  z: 10
+                  activeBar: optionsWindow.activeBar
+                  revealed: optionsWindow.barsRevealed
+                  mounted: optionsWindow.barsMounted
+              }
                 Keys.onPressed: (event) => {
                     if (event.key === Qt.Key_Escape) {
                         root.shouldShow = false
@@ -231,7 +233,7 @@ Scope {
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    hoverEnabled: true
+                                    hoverEnabled: !optionsWindow.barsRevealed
                                     z: 5
                                     onEntered: optionsWindow.activeBar = barOuter.index
                                     onClicked: {
