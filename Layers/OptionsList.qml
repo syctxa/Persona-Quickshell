@@ -35,25 +35,22 @@ Item {
 
     // shader path used per-tab when toggled on
     readonly property var shaderPaths: [
-        "/home/yujon/.config/hypr/Shaders/bluelight.frag",
-        "/home/yujon/.config/hypr/Shaders/grey.glsl",
-        "/home/yujon/.config/hypr/Shaders/invert.glsl"
+        Qt.resolvedUrl("../Assets/ScreenShaders/bluelight.frag").toString().replace("file://", ""),
+        Qt.resolvedUrl("../Assets/ScreenShaders/grey.glsl").toString().replace("file://", ""),
+        Qt.resolvedUrl("../Assets/ScreenShaders/invert.glsl").toString().replace("file://", "")
     ]
 
-    readonly property string offShader: "/home/yujon/.config/hypr/Shaders/vibrant.glsl"
+    readonly property string offShader: Qt.resolvedUrl("../Assets/ScreenShaders/vibrant.glsl").toString().replace("file://", "")
 
 
     function toggleShader(index) {
-        if (activeShaderIndex === index) {
+      if (activeShaderIndex === index) {
         activeShaderIndex = -1
-        const cmd = "hl.config({ decoration = { screen_shader = \"" + offShader + "\" } })"
-        shaderProc.command = ["hyprctl", "eval", cmd]
+        shaderProc.command = ["hyprctl", "keyword", "decoration:screen_shader", offShader]
         shaderProc.startDetached()
-        } else {
+      } else {
         activeShaderIndex = index
-        const shaderPath = shaderPaths[index]
-        const cmd = "hl.config({ decoration = { screen_shader = \"" + shaderPath + "\" } })"
-        shaderProc.command = ["hyprctl", "eval", cmd]
+        shaderProc.command = ["hyprctl", "keyword", "decoration:screen_shader", shaderPaths[index]]
         shaderProc.startDetached()
       }
     }
