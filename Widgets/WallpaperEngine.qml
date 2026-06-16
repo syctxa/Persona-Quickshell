@@ -30,7 +30,9 @@ WlrLayershell {
         source: Qt.resolvedUrl("../Assets/p3r imgs/bg.png")
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
-        smooth: true; mipmap: true; visible: false
+        smooth: true
+        mipmap: true
+        visible: false
     }
 
     Image {
@@ -38,7 +40,9 @@ WlrLayershell {
         source: Qt.resolvedUrl("../Assets/Depth masks/cloudmask.png")
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
-        smooth: true; mipmap: true; visible: false
+        smooth: true
+        mipmap: true
+        visible: false
     }
 
     Image {
@@ -46,7 +50,9 @@ WlrLayershell {
         source: Qt.resolvedUrl("../Assets/Depth masks/normalmaps/waterripplenormal.png")
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
-        smooth: true; mipmap: true; visible: false
+        smooth: true
+        mipmap: true
+        visible: false
     }
 
     Image {
@@ -54,7 +60,9 @@ WlrLayershell {
         source: Qt.resolvedUrl("../Assets/p3r imgs/bars.png")
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
-        smooth: true; mipmap: true; visible: false
+        smooth: true
+        mipmap: true
+        visible: false
     }
 
     Image {
@@ -62,7 +70,9 @@ WlrLayershell {
         source: Qt.resolvedUrl("../Assets/Depth masks/makotodepth.png")
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
-        smooth: true; mipmap: true; visible: false
+        smooth: true
+        mipmap: true
+        visible: false
     }
 
     // ── Stage 0a: Ripple ──
@@ -71,21 +81,23 @@ WlrLayershell {
         anchors.fill: parent
         visible: true
 
-        property var  source:       bgRaw
-        property var  normalMap:    normalMapRipple
-        property var  depthMask:    cloudMaskRaw
-        property real time:         0
+        property var source: bgRaw
+        property var normalMap: normalMapRipple
+        property var depthMask: cloudMaskRaw
+        property real time: 0
         property real flowStrength: 0.006
-        property real speed:        2.5
-        property real frequency:    1.0
+        property real speed: 2.5
+        property real frequency: 1.0
 
         NumberAnimation on time {
-            from: 0; to: 10; duration: 800000
+            from: 0
+            to: 10
+            duration: 800000
             loops: Animation.Infinite
             running: true
         }
 
-        vertexShader:   Qt.resolvedUrl("../Assets/shaders/ripple/ripple.vert.qsb")
+        vertexShader: Qt.resolvedUrl("../Assets/shaders/ripple/ripple.vert.qsb")
         fragmentShader: Qt.resolvedUrl("../Assets/shaders/ripple/ripple.frag.qsb")
     }
 
@@ -104,18 +116,21 @@ WlrLayershell {
         anchors.fill: parent
         visible: false
 
-        property var  source:    s0_clouds_out
-        property real time:      0
-        property real strength:  50
-        property real speed:     5.5
+        property var source: s0_clouds_out
+        property real time: 0
+        property real strength: 50
+        property real speed: 5.5
         property real frequency: 10.0
 
         NumberAnimation on time {
-            from: 0; to: 1000; duration: 500000
-            loops: Animation.Infinite; running: true
+            from: 0
+            to: 1000
+            duration: 500000
+            loops: Animation.Infinite
+            running: true
         }
 
-        vertexShader:   Qt.resolvedUrl("../Assets/shaders/stars/stars.vert.qsb")
+        vertexShader: Qt.resolvedUrl("../Assets/shaders/stars/stars.vert.qsb")
         fragmentShader: Qt.resolvedUrl("../Assets/shaders/stars/stars.frag.qsb")
     }
 
@@ -137,37 +152,31 @@ WlrLayershell {
             id: s1_bars_motion
             anchors.fill: parent
 
-            property var  source: barsRaw
-            property real time:   0
-            property real speed:  1
+            property var source: barsRaw
+            property real time: 0
+            property real speed: 1
 
             NumberAnimation on time {
-                from: 0; to: 10000; duration: 10000000
-                loops: Animation.Infinite; running: true
+                from: 0
+                to: 10000
+                duration: 10000000
+                loops: Animation.Infinite
+                running: true
             }
 
-            vertexShader:   Qt.resolvedUrl("../Assets/shaders/motion/motion.vert.qsb")
+            vertexShader: Qt.resolvedUrl("../Assets/shaders/motion/motion.vert.qsb")
             fragmentShader: Qt.resolvedUrl("../Assets/shaders/motion/motion.frag.qsb")
         }
 
         CavaVisualizer {
             id: s1_cava
             anchors {
-                left:      parent.left
-                right:     parent.right
-                top:       parent.top
+                left: parent.left
+                right: parent.right
+                top: parent.top
                 topMargin: 0
             }
             height: 555
-        }
-
-        Image {
-            id: s1_fg
-            source: Qt.resolvedUrl("../Assets/p3r imgs/fg.png")
-            anchors.fill: parent
-            fillMode: Image.PreserveAspectCrop
-            smooth: true
-            mipmap: true
         }
 
         Text {
@@ -177,10 +186,10 @@ WlrLayershell {
             font.family: "Glirock"
             color: Dat.Colors.color9
             anchors {
-                horizontalCenter:       parent.horizontalCenter
+                horizontalCenter: parent.horizontalCenter
                 horizontalCenterOffset: -parent.width * 0.15
-                bottom:                 parent.bottom
-                bottomMargin:           parent.height * 0.650
+                bottom: parent.bottom
+                bottomMargin: parent.height * 0.620
             }
         }
 
@@ -191,11 +200,20 @@ WlrLayershell {
             font.family: "Glirock"
             color: Dat.Colors.color6
             anchors {
-                horizontalCenter:       parent.horizontalCenter
+                horizontalCenter: parent.horizontalCenter
                 horizontalCenterOffset: parent.width * 0.104
-                bottom:                 parent.bottom
-                bottomMargin:           parent.height * 0.650
+                bottom: parent.bottom
+                bottomMargin: parent.height * 0.620
             }
+        }
+
+        Image {
+            id: s1_fg
+            source: Qt.resolvedUrl("../Assets/p3r imgs/fg.png")
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectCrop
+            smooth: true
+            mipmap: true
         }
     }
 
@@ -215,14 +233,14 @@ WlrLayershell {
         anchors.fill: parent
         visible: true
 
-        property var  source:           s1_out
-        property real offsetX:          root.mouseOffsetX
-        property real offsetY:          root.mouseOffsetY
+        property var source: s1_out
+        property real offsetX: root.mouseOffsetX
+        property real offsetY: root.mouseOffsetY
         property real parallaxStrength: 0.03
-        property real aspectRatio:      width / height
-        property var  depthMap:         depthMapRaw
+        property real aspectRatio: width / height
+        property var depthMap: depthMapRaw
 
-        vertexShader:   Qt.resolvedUrl("../Assets/shaders/parallax/parallax.vert.qsb")
+        vertexShader: Qt.resolvedUrl("../Assets/shaders/parallax/parallax.vert.qsb")
         fragmentShader: Qt.resolvedUrl("../Assets/shaders/parallax/parallax.frag.qsb")
     }
 
@@ -231,9 +249,9 @@ WlrLayershell {
         anchors.fill: parent
         hoverEnabled: true
         acceptedButtons: Qt.NoButton
-        onPositionChanged: (mouse) => {
-            root.mouseOffsetX = (mouse.x / width  - 0.5) * 2.0
-            root.mouseOffsetY = (mouse.y / height - 0.5) * 2.0
+        onPositionChanged: mouse => {
+            root.mouseOffsetX = (mouse.x / width - 0.5) * 2.0;
+            root.mouseOffsetY = (mouse.y / height - 0.5) * 2.0;
         }
     }
 }

@@ -9,10 +9,16 @@ Singleton {
     property real mouseOffsetX: 0.0
     property real mouseOffsetY: 0.0
 
-  Behavior on mouseOffsetX {
-    NumberAnimation { duration: 800; easing.type: Easing.OutQuart }
-  }
-  Behavior on mouseOffsetY {
-    NumberAnimation { duration: 800; easing.type: Easing.OutQuart }
-  }
+    Behavior on mouseOffsetX {
+        NumberAnimation {
+            duration: 800
+            easing.type: Easing.OutQuart
+        }
+    }
+    Behavior on mouseOffsetY {
+        NumberAnimation {
+            duration: 800
+            easing.type: Easing.OutQuart
+        }
+    }
 }

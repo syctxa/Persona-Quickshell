@@ -9,7 +9,7 @@ import QtQuick.Layouts
 import Quickshell.Hyprland
 
 ShellRoot {
-    Variants{
+    Variants {
         model: Quickshell.screens
         PanelWindow {
             id: bar
@@ -77,15 +77,15 @@ ShellRoot {
                         width: 80
                         height: 80
                         onPaint: {
-                            var ctx = getContext("2d")
-                            ctx.clearRect(0, 0, width, height)
-                            ctx.fillStyle = "black"
-                            ctx.beginPath()
-                            ctx.moveTo(width / 2, height)      // Bottom point (tip)
-                            ctx.lineTo(0, 0)                   // Top left
-                            ctx.lineTo(width, 0)               // Top right
-                            ctx.closePath()
-                            ctx.fill()
+                            var ctx = getContext("2d");
+                            ctx.clearRect(0, 0, width, height);
+                            ctx.fillStyle = "black";
+                            ctx.beginPath();
+                            ctx.moveTo(width / 2, height);      // Bottom point (tip)
+                            ctx.lineTo(0, 0);                   // Top left
+                            ctx.lineTo(width, 0);               // Top right
+                            ctx.closePath();
+                            ctx.fill();
                         }
                     }
                     Item {
@@ -93,19 +93,19 @@ ShellRoot {
                         width: dayText.implicitWidth
                         height: dayText.implicitHeight
                         Text {
-                          id: dayText
-                          anchors.centerIn: parent
-                          anchors.verticalCenterOffset: -79
-                          text: clock.date.toLocaleString(Qt.locale("en_US"), "ddd")
-                          font.family: "Linux Biolinum"
-                          font.bold: true
-                          font.pixelSize: 25
-                          color: "white"
-                          font.letterSpacing: -2
-                          transform: Scale {
-                              yScale: 2.0
-                              xScale: 1.0
-                          }
+                            id: dayText
+                            anchors.centerIn: parent
+                            anchors.verticalCenterOffset: -79
+                            text: clock.date.toLocaleString(Qt.locale("en_US"), "ddd")
+                            font.family: "Linux Biolinum"
+                            font.bold: true
+                            font.pixelSize: 25
+                            color: "white"
+                            font.letterSpacing: -2
+                            transform: Scale {
+                                yScale: 2.0
+                                xScale: 1.0
+                            }
                         }
                     }
                 }

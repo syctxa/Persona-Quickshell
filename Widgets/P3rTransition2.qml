@@ -35,6 +35,16 @@ Scope {
         }
       }
 
+      Timer {
+        id: safetyTimer
+        interval: 1500
+        repeat: false
+        onTriggered: {
+          root.shouldShow = false
+          root.finished()
+        }
+      }
+
       Rectangle {
         id: bgBlock
         anchors.top: parent.top
@@ -43,9 +53,7 @@ Scope {
         color: "#000000"
         x: -width
         z: 0
-
-        function startAnim() { bgAnim.restart() }
-
+        function startAnim() { bgBlock.opacity = 1; bgAnim.restart() }
         SequentialAnimation {
           id: bgAnim
           running: false
@@ -55,12 +63,12 @@ Scope {
             duration: 350
             easing.type: Easing.OutExpo
           }
-          PauseAnimation { duration: 120 }
+          PauseAnimation { duration: 400 }
           NumberAnimation {
-            target: bgBlock; property: "x"
-            from: 0; to: -bgBlock.width
-            duration: 300
-            easing.type: Easing.InExpo
+            target: bgBlock; property: "opacity"
+            from: 1; to: 0
+            duration: 200
+            easing.type: Easing.InQuad
           }
         }
       }
@@ -78,6 +86,7 @@ Scope {
             { color: "#1a6aff", delay: 80  },
             { color: "#7dd4fc", delay: 160 },
           ]
+
           function restartAll() {
             for (var i = 0; i < count; i++)
               itemAt(i).startAnim()
@@ -87,58 +96,57 @@ Scope {
             id: blockItem
             required property var modelData
             required property int index
-            width: transitionWindow.width * 0.85
+            width: transitionWindow.width * 0.95
             height: transitionWindow.height * 0.3
             x: -width
+            clip: true
 
-            function startAnim() { blockAnim.restart() }
+            transform: Matrix4x4 {
+              matrix: Qt.matrix4x4(
+                1, -0.15, 0, 0,
+                0,  1,    0, 0,
+                0,  0,    1, 0,
+                0,  0,    0, 1
+              )
+            }
 
             Rectangle {
               anchors.fill: parent
               color: blockItem.modelData.color
-              transform: Matrix4x4 {
-                matrix: Qt.matrix4x4(
-                  1, -0.05, 0, 0,
-                  0,  1,    0, 0,
-                  0,  0,    1, 0,
-                  0,  0,    0, 1
-                )
-              }
             }
+
+            function startAnim() { blockItem.opacity = 1; blockAnim.restart() }
 
             SequentialAnimation {
               id: blockAnim
               running: false
-
               PauseAnimation { duration: blockItem.modelData.delay }
-
               NumberAnimation {
                 target: blockItem; property: "x"
                 from: -blockItem.width; to: 0
                 duration: 350
                 easing.type: Easing.OutExpo
               }
-
-              ScriptAction {
-                script: {
-                  if (blockItem.index === 2) root.peaked()
-                }
-              }
-
-              PauseAnimation { duration: 180 }
-
-              NumberAnimation {
-                target: blockItem; property: "x"
-                from: 0; to: -blockItem.width
-                duration: 300
-                easing.type: Easing.InExpo
-              }
-
-              PauseAnimation { duration: 50 }
-
               ScriptAction {
                 script: {
                   if (blockItem.index === 2) {
+                    safetyTimer.start()
+                    root.peaked()
+                  }
+                }
+              }
+              PauseAnimation { duration: 200 }
+              NumberAnimation {
+                target: blockItem; property: "opacity"
+                from: 1; to: 0
+                duration: 200
+                easing.type: Easing.InQuad
+              }
+              ScriptAction {
+                script: {
+                  if (blockItem.index === 2) {
+                    safetyTimer.stop()
+                    root.shouldShow = false
                     root.finished()
                   }
                 }

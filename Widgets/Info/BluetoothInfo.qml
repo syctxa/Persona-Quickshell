@@ -29,9 +29,5 @@ Singleton {
     property list<var> connectedDevices: Bluetooth.devices.values.filter(d => d.connected).sort(sortFunction)
     property list<var> pairedButNotConnectedDevices: Bluetooth.devices.values.filter(d => d.paired && !d.connected).sort(sortFunction)
     property list<var> unpairedDevices: Bluetooth.devices.values.filter(d => !d.paired && !d.connected).sort(sortFunction)
-    property list<var> friendlyDeviceList: [
-        ...connectedDevices,
-        ...pairedButNotConnectedDevices,
-        ...unpairedDevices
-    ]
+    property list<var> friendlyDeviceList: [...connectedDevices, ...pairedButNotConnectedDevices, ...unpairedDevices]
 }

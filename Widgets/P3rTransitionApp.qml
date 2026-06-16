@@ -6,6 +6,8 @@ Scope {
     id: root
     property bool shouldShow: false
     property var targetScreen: null
+    signal finished
+    signal peaked
 
     LazyLoader {
         active: true
@@ -15,23 +17,27 @@ Scope {
             screen: root.targetScreen
             color: "transparent"
             WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             anchors {
                 left: true
-                right: true
                 top: true
                 bottom: true
             }
+            implicitWidth: transitionWindow.screen ? transitionWindow.screen.width * 0.33 : 640
+
             onVisibleChanged: {
                 if (visible)
                     startDelay.start();
             }
+
             Timer {
                 id: startDelay
                 interval: 80
                 repeat: false
                 onTriggered: blockRepeater.restartAll()
             }
+
             Repeater {
                 id: blockRepeater
                 model: [
@@ -85,7 +91,6 @@ Scope {
                         PauseAnimation {
                             duration: blockItem.modelData.delay
                         }
-                        // Wipe in
                         NumberAnimation {
                             target: blockScale
                             property: "xScale"
@@ -94,11 +99,15 @@ Scope {
                             duration: 350
                             easing.type: Easing.InOutQuart
                         }
-                        // Hold
+                        ScriptAction {
+                            script: {
+                                if (blockItem.index === 2)
+                                    root.peaked();
+                            }
+                        }
                         PauseAnimation {
                             duration: 200
                         }
-                        // Wipe out
                         NumberAnimation {
                             target: blockScale
                             property: "xScale"
@@ -109,8 +118,10 @@ Scope {
                         }
                         ScriptAction {
                             script: {
-                                if (blockItem.index === 2)
+                                if (blockItem.index === 2) {
                                     root.shouldShow = false;
+                                    root.finished();
+                                }
                             }
                         }
                     }

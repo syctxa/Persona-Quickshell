@@ -2,17 +2,35 @@ import QtQuick
 import QtMultimedia
 import Quickshell
 import Quickshell.Wayland
+import qs.Widgets as Wid
 
 Scope {
     id: root
     property bool shouldShow: false
     property var targetScreen: null
+    property bool contentVisible: false
 
     readonly property var barData: [
-        { role: "LEADER", label: "Bluelight", char: Qt.resolvedUrl("../Assets/components/char1.png") },
-        { role: "PARTY",  label: "Greyscale", char: Qt.resolvedUrl("../Assets/components/char2.png") },
-        { role: "PARTY",  label: "Inversion", char: Qt.resolvedUrl("../Assets/components/char3.png") },
+        {
+            role: "LEADER",
+            label: "Bluelight",
+            char: Qt.resolvedUrl("../Assets/components/char1.png")
+        },
+        {
+            role: "PARTY",
+            label: "Greyscale",
+            char: Qt.resolvedUrl("../Assets/components/char2.png")
+        },
+        {
+            role: "PARTY",
+            label: "Inversion",
+            char: Qt.resolvedUrl("../Assets/components/char3.png")
+        },
     ]
+
+    Wid.P3rTransition2 {
+        id: optionsTransition
+    }
 
     LazyLoader {
         active: true
@@ -23,32 +41,36 @@ Scope {
             color: "transparent"
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
-            WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-            anchors { left: true; right: true; top: true; bottom: true }
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+            anchors {
+                left: true
+                right: true
+                top: true
+                bottom: true
+            }
+            Connections {
+                target: optionsTransition
+                function onPeaked() {
+                    bgVideo.play();
+                    contentVisible = true;
+                }
+            }
+            property int activeBar: 0
+            property bool barsRevealed: false
 
             onVisibleChanged: {
                 if (visible) {
-                    bgVideo.play()
-                    barsMounted = false
-                    barsRevealed = false
-                    activeBar = 0
-                    mountTimer.start()
+                    contentVisible = false;
+                    optionsWindow.activeBar = 0;
+                    optionsWindow.barsRevealed = false;
+                    optionsTransition.targetScreen = root.targetScreen;
+                    optionsTransition.shouldShow = true;
                 } else {
-                    bgVideo.stop()
-                    barsMounted = false
-                    barsRevealed = false
-                    activeBar = 0
+                    bgVideo.stop();
+                    contentVisible = false;
+                    optionsWindow.activeBar = 0;
+                    optionsWindow.barsRevealed = false;
                 }
-            }
-
-            property int activeBar: 0
-            property bool barsRevealed: false
-            property bool barsMounted: false
-
-            Timer {
-                id: mountTimer
-                interval: 60
-                onTriggered: optionsWindow.barsMounted = true
             }
 
             Video {
@@ -60,46 +82,25 @@ Scope {
                 volume: 0
                 z: 0
             }
+
             Item {
                 id: contentRoot
                 anchors.fill: parent
                 z: 3
-                focus: true
+                visible: root.contentVisible
 
                 MouseArea {
                     anchors.fill: parent
                     z: -1
                     onClicked: root.shouldShow = false
                 }
-              OptionsList {
-                  anchors.fill: parent
-                  z: 10
-                  activeBar: optionsWindow.activeBar
-                  revealed: optionsWindow.barsRevealed
-                  mounted: optionsWindow.barsMounted
-              }
-                Keys.onPressed: (event) => {
-                    if (event.key === Qt.Key_Escape) {
-                        root.shouldShow = false
-                        event.accepted = true
-                    }
-                    if (event.key === Qt.Key_Up) {
-                        if (optionsWindow.activeBar > 0) optionsWindow.activeBar--
-                        event.accepted = true
-                    }
-                    if (event.key === Qt.Key_Down) {
-                        if (optionsWindow.activeBar < 2) optionsWindow.activeBar++
-                        event.accepted = true
-                    }
-                    if (event.key === Qt.Key_Return || event.key === Qt.Key_Right) {
-                        optionsWindow.barsRevealed = true
-                        event.accepted = true
-                    }
-                    if (event.key === Qt.Key_Left) {
-                        if (optionsWindow.barsRevealed) optionsWindow.barsRevealed = false
-                        else root.shouldShow = false
-                        event.accepted = true
-                    }
+
+                OptionsList {
+                    anchors.fill: parent
+                    z: 10
+                    activeBar: optionsWindow.activeBar
+                    revealed: optionsWindow.barsRevealed
+                    mounted: root.contentVisible
                 }
 
                 // ── bars ──
@@ -117,11 +118,16 @@ Scope {
                             required property int index
 
                             property bool isActive: index === optionsWindow.activeBar
-                            property bool isMounted: optionsWindow.barsMounted
+                            property bool isMounted: root.contentVisible
 
                             width: barMain.width
                             height: isActive ? 90 : 64
-                            Behavior on height { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
+                            Behavior on height {
+                                NumberAnimation {
+                                    duration: 300
+                                    easing.type: Easing.OutCubic
+                                }
+                            }
 
                             x: isMounted ? 0 : -(barMain.width + 20)
                             Behavior on x {
@@ -131,7 +137,6 @@ Scope {
                                 }
                             }
 
-                            // red underlay
                             Rectangle {
                                 x: barMain.width * 0.5
                                 y: -7
@@ -139,9 +144,13 @@ Scope {
                                 height: parent.height
                                 color: "#c4001a"
                                 opacity: barOuter.isActive ? 1 : 0
-                                Behavior on opacity { NumberAnimation { duration: 200 } }
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 200
+                                    }
+                                }
                             }
-                            // main bar
+
                             Rectangle {
                                 id: barMain
                                 width: Math.round(optionsWindow.width * 0.45)
@@ -149,14 +158,18 @@ Scope {
                                 color: "#111111"
                                 clip: true
 
-                                // white fill
                                 Rectangle {
                                     anchors.top: parent.top
                                     anchors.bottom: parent.bottom
                                     anchors.right: parent.right
                                     width: barOuter.isActive ? parent.width * 0.78 : 32
                                     color: "white"
-                                    Behavior on width { NumberAnimation { duration: 350; easing.type: Easing.OutCubic } }
+                                    Behavior on width {
+                                        NumberAnimation {
+                                            duration: 350
+                                            easing.type: Easing.OutCubic
+                                        }
+                                    }
 
                                     Rectangle {
                                         anchors.left: parent.left
@@ -164,16 +177,25 @@ Scope {
                                         anchors.bottom: parent.bottom
                                         width: parent.width * 0.08
                                         opacity: barOuter.isActive ? 1 : 0
-                                        Behavior on opacity { NumberAnimation { duration: 350 } }
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: 350
+                                            }
+                                        }
                                         gradient: Gradient {
                                             orientation: Gradient.Horizontal
-                                            GradientStop { position: 0.0; color: "#26000000" }
-                                            GradientStop { position: 1.0; color: "transparent" }
+                                            GradientStop {
+                                                position: 0.0
+                                                color: "#26000000"
+                                            }
+                                            GradientStop {
+                                                position: 1.0
+                                                color: "transparent"
+                                            }
                                         }
                                     }
                                 }
 
-                                // bottom shadow
                                 Rectangle {
                                     anchors.bottom: parent.bottom
                                     anchors.left: parent.left
@@ -181,12 +203,17 @@ Scope {
                                     height: 6
                                     z: 10
                                     gradient: Gradient {
-                                        GradientStop { position: 0.0; color: "transparent" }
-                                        GradientStop { position: 1.0; color: "#8c000000" }
+                                        GradientStop {
+                                            position: 0.0
+                                            color: "transparent"
+                                        }
+                                        GradientStop {
+                                            position: 1.0
+                                            color: "#8c000000"
+                                        }
                                     }
                                 }
 
-                                // character portrait
                                 Image {
                                     source: barOuter.modelData.char
                                     anchors.top: parent.top
@@ -198,7 +225,6 @@ Scope {
                                     z: 3
                                 }
 
-                                // content row
                                 Row {
                                     anchors.fill: parent
                                     anchors.leftMargin: 20
@@ -226,7 +252,11 @@ Scope {
                                             font.family: bebasNeue.name
                                             font.pixelSize: 28
                                             color: barOuter.isActive ? "#111111" : "#d9ffffff"
-                                            Behavior on color { ColorAnimation { duration: 200 } }
+                                            Behavior on color {
+                                                ColorAnimation {
+                                                    duration: 200
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -237,8 +267,8 @@ Scope {
                                     z: 5
                                     onEntered: optionsWindow.activeBar = barOuter.index
                                     onClicked: {
-                                        optionsWindow.activeBar = barOuter.index
-                                        optionsWindow.barsRevealed = true
+                                        optionsWindow.activeBar = barOuter.index;
+                                        optionsWindow.barsRevealed = true;
                                     }
                                 }
                             }
@@ -246,15 +276,18 @@ Scope {
                     }
                 }
 
-                // ── footer hints ──
                 Column {
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
                     anchors.bottomMargin: 20
                     anchors.rightMargin: 28
                     spacing: 5
-                    opacity: optionsWindow.barsMounted ? 1 : 0
-                    Behavior on opacity { NumberAnimation { duration: 400 } }
+                    opacity: root.contentVisible ? 1 : 0
+                    Behavior on opacity {
+                        NumberAnimation {
+                            duration: 400
+                        }
+                    }
 
                     Repeater {
                         delegate: Row {

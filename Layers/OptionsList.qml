@@ -12,9 +12,14 @@ Item {
     property int localTab: activeBar
     property int activeShaderIndex: -1
     onActiveBarChanged: localTab = activeBar
-    FontLoader { id: bebasNeue; source: Qt.resolvedUrl("../Assets/fonts/BebasNeue-Regular.ttf") }
-    FontLoader { id: montserrat; source: Qt.resolvedUrl("../Assets/fonts/Montserrat-Light.ttf") }
-
+    FontLoader {
+        id: bebasNeue
+        source: Qt.resolvedUrl("../Assets/fonts/BebasNeue-Regular.ttf")
+    }
+    FontLoader {
+        id: montserrat
+        source: Qt.resolvedUrl("../Assets/fonts/Montserrat-Light.ttf")
+    }
     readonly property var revealContent: [
         {
             upper: ["Filter to reduce Bluelight"],
@@ -22,7 +27,7 @@ Item {
             portrait: Qt.resolvedUrl("../Assets/components/mainm.jpeg")
         },
         {
-            upper: ["Black and white only" ],
+            upper: ["Black and white only"],
             lower: "grey scale filter",
             portrait: Qt.resolvedUrl("../Assets/components/mainm2.jpeg")
         },
@@ -34,36 +39,31 @@ Item {
     ]
 
     // shader path used per-tab when toggled on
-    readonly property var shaderPaths: [
-        Qt.resolvedUrl("../Assets/ScreenShaders/bluelight.frag").toString().replace("file://", ""),
-        Qt.resolvedUrl("../Assets/ScreenShaders/grey.glsl").toString().replace("file://", ""),
-        Qt.resolvedUrl("../Assets/ScreenShaders/invert.glsl").toString().replace("file://", "")
-    ]
+    readonly property var shaderPaths: [Qt.resolvedUrl("../Assets/ScreenShaders/bluelight.frag").toString().replace("file://", ""), Qt.resolvedUrl("../Assets/ScreenShaders/grey.glsl").toString().replace("file://", ""), Qt.resolvedUrl("../Assets/ScreenShaders/invert.glsl").toString().replace("file://", "")]
 
     readonly property string offShader: Qt.resolvedUrl("../Assets/ScreenShaders/vibrant.glsl").toString().replace("file://", "")
 
-
     function toggleShader(index) {
         if (activeShaderIndex === index) {
-            activeShaderIndex = -1
-            shaderProc.command = ["hyprctl", "eval", "hl.config({ decoration = { screen_shader = \"\" } })"]
-            shaderProc.startDetached()
+            activeShaderIndex = -1;
+            shaderProc.command = ["hyprctl", "eval", "hl.config({ decoration = { screen_shader = \"\" } })"];
+            shaderProc.startDetached();
         } else {
-            activeShaderIndex = index
-            shaderProc.command = ["hyprctl", "eval", "hl.config({ decoration = { screen_shader = \"" + shaderPaths[index] + "\" } })"]
-            shaderProc.startDetached()
+            activeShaderIndex = index;
+            shaderProc.command = ["hyprctl", "eval", "hl.config({ decoration = { screen_shader = \"" + shaderPaths[index] + "\" } })"];
+            shaderProc.startDetached();
         }
     }
 
     Process {
-      id: shaderProc
-      stdout: SplitParser {
-          onRead: data => console.log("STDOUT:", data)
-      }
-      stderr: SplitParser {
-          onRead: data => console.log("STDERR:", data)
-      }
-      onExited: (code, status) => console.log("Exited:", code, status)
+        id: shaderProc
+        stdout: SplitParser {
+            onRead: data => console.log("STDOUT:", data)
+        }
+        stderr: SplitParser {
+            onRead: data => console.log("STDERR:", data)
+        }
+        onExited: (code, status) => console.log("Exited:", code, status)
     }
 
     // dim overlay
@@ -72,7 +72,11 @@ Item {
         color: "#ad282d36"
         z: 12
         opacity: revealRoot.revealed ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 320 } }
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 320
+            }
+        }
     }
 
     // portrait shell
@@ -85,7 +89,11 @@ Item {
         width: parent.width * 0.52
         clip: true
         opacity: revealRoot.revealed && revealRoot.mounted ? 0.96 : 0
-        Behavior on opacity { NumberAnimation { duration: 350 } }
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 350
+            }
+        }
 
         transform: [
             Translate {
@@ -127,8 +135,14 @@ Item {
             verticalAlignment: Image.AlignTop
             horizontalAlignment: Image.AlignRight
             transform: [
-                Rotation { angle: 0 },
-                Scale { xScale: 1.08; yScale: 1.0; origin.x: portraitShell.width }
+                Rotation {
+                    angle: 0
+                },
+                Scale {
+                    xScale: 1.08
+                    yScale: 1.0
+                    origin.x: portraitShell.width
+                }
             ]
         }
     }
@@ -143,7 +157,11 @@ Item {
         height: parent.height * 0.60
         enabled: revealRoot.revealed && revealRoot.mounted
         opacity: revealRoot.revealed && revealRoot.mounted ? 0.92 : 0
-        Behavior on opacity { NumberAnimation { duration: 300 } }
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 300
+            }
+        }
 
         transform: [
             Rotation {
@@ -176,11 +194,17 @@ Item {
         ]
 
         Rectangle {
-          anchors.fill: parent
-          gradient: Gradient {
-            GradientStop { position: 0.0; color: "#f50f1c69" }
-            GradientStop { position: 1.0; color: "#f7081044" }
-          }
+            anchors.fill: parent
+            gradient: Gradient {
+                GradientStop {
+                    position: 0.0
+                    color: "#f50f1c69"
+                }
+                GradientStop {
+                    position: 1.0
+                    color: "#f7081044"
+                }
+            }
         }
 
         Rectangle {
@@ -221,9 +245,16 @@ Item {
                         border.width: 1
                         transformOrigin: Item.Center
 
-                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: 150
+                            }
+                        }
                         Behavior on scale {
-                            NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                            NumberAnimation {
+                                duration: 120
+                                easing.type: Easing.OutCubic
+                            }
                         }
 
                         Text {
@@ -231,7 +262,11 @@ Item {
                             text: parent.parent.modelData
                             font.pixelSize: 14
                             color: parent.parent.index === revealRoot.localTab ? "#111111" : "#66ffffff"
-                            Behavior on color { ColorAnimation { duration: 150 } }
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: 150
+                                }
+                            }
                         }
                     }
 
@@ -288,9 +323,16 @@ Item {
             border.width: 1
             transformOrigin: Item.Center
 
-            Behavior on color { ColorAnimation { duration: 150 } }
+            Behavior on color {
+                ColorAnimation {
+                    duration: 150
+                }
+            }
             Behavior on scale {
-                NumberAnimation { duration: 120; easing.type: Easing.OutCubic }
+                NumberAnimation {
+                    duration: 120
+                    easing.type: Easing.OutCubic
+                }
             }
 
             Row {
@@ -315,7 +357,11 @@ Item {
                     font.family: bebasNeue.name
                     font.pixelSize: 16
                     color: revealRoot.activeShaderIndex === revealRoot.localTab ? "#4a8fff" : "#66ffffff"
-                    Behavior on color { ColorAnimation { duration: 150 } }
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 150
+                        }
+                    }
                 }
             }
 
@@ -336,7 +382,11 @@ Item {
         y: parent.height * 0.10
         spacing: 6
         opacity: revealRoot.revealed ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 300 } }
+        Behavior on opacity {
+            NumberAnimation {
+                duration: 300
+            }
+        }
 
         transform: Rotation {
             angle: -20

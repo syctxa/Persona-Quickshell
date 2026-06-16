@@ -10,9 +10,21 @@ Scope {
     property bool shouldShow: false
     property var targetScreen: null
 
-    Process { id: poweroffProcess; command: ["loginctl", "poweroff"]; running: false }
-    Process { id: restartProcess;  command: ["loginctl", "reboot"];   running: false }
-    Process { id: logoutProcess;   command: ["loginctl", "terminate-session", "self"]; running: false }
+    Process {
+        id: poweroffProcess
+        command: ["loginctl", "poweroff"]
+        running: false
+    }
+    Process {
+        id: restartProcess
+        command: ["loginctl", "reboot"]
+        running: false
+    }
+    Process {
+        id: logoutProcess
+        command: ["loginctl", "terminate-session", "self"]
+        running: false
+    }
 
     LazyLoader {
         active: true
@@ -24,9 +36,15 @@ Scope {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
             WlrLayershell.keyboardFocus: visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-            anchors { right: true; left: true; top: true; bottom: true }
+            anchors {
+                right: true
+                left: true
+                top: true
+                bottom: true
+            }
             onVisibleChanged: {
-                if (visible) overlay.resetMenu()
+                if (visible)
+                    overlay.resetMenu();
             }
             Rectangle {
                 id: overlay
@@ -35,36 +53,43 @@ Scope {
                 property int stage: 0
 
                 function resetMenu() {
-                    stage = 0
-                    opacity = 1
-                    pngSequence.visible = false
-                    pngSequence.currentFrame = 0
-                    part2Video.stop(); part2Video.visible = false; part2Video.seek(0)
-                    part3Video.stop(); part3Video.visible = false; part3Video.seek(0)
-                    startDelay.start()
-                  }
-                  Timer {
-                      id: startDelay
-                      interval: 80
-                      repeat: false
-                      onTriggered: {
-                          pngSequence.visible = true
-                          frameAnimation.start()
-                      }
-                  }
+                    stage = 0;
+                    opacity = 1;
+                    pngSequence.visible = false;
+                    pngSequence.currentFrame = 0;
+                    part2Video.stop();
+                    part2Video.visible = false;
+                    part2Video.seek(0);
+                    part3Video.stop();
+                    part3Video.visible = false;
+                    part3Video.seek(0);
+                    startDelay.start();
+                }
+                Timer {
+                    id: startDelay
+                    interval: 80
+                    repeat: false
+                    onTriggered: {
+                        pngSequence.visible = true;
+                        frameAnimation.start();
+                    }
+                }
 
                 NumberAnimation {
                     id: hideAnimation
-                    target: overlay; property: "opacity"
-                    from: 1; to: 0
-                    duration: 300; easing.type: Easing.InCubic
+                    target: overlay
+                    property: "opacity"
+                    from: 1
+                    to: 0
+                    duration: 300
+                    easing.type: Easing.InCubic
                     onFinished: {
-                        frameAnimation.stop()
-                        part2Video.stop()
-                        part3Video.stop()
-                        root.shouldShow = false
-                        overlay.stage = 0
-                        pngSequence.currentFrame = 0
+                        frameAnimation.stop();
+                        part2Video.stop();
+                        part3Video.stop();
+                        root.shouldShow = false;
+                        overlay.stage = 0;
+                        pngSequence.currentFrame = 0;
                     }
                 }
 
@@ -83,7 +108,7 @@ Scope {
 
                     onStatusChanged: {
                         if (status === Image.Ready && currentFrame === 0) {
-                            visible = true  // ← show only once frame 0 is loaded
+                            visible = true;  // ← show only once frame 0 is loaded
                         }
                     }
 
@@ -93,13 +118,13 @@ Scope {
                         repeat: true
                         onTriggered: {
                             if (pngSequence.currentFrame < pngSequence.totalFrames - 1) {
-                                pngSequence.currentFrame++
+                                pngSequence.currentFrame++;
                             } else {
-                                stop()
-                                pngSequence.visible = false
-                                overlay.stage = 1
-                                part2Video.visible = true
-                                part2Video.play()
+                                stop();
+                                pngSequence.visible = false;
+                                overlay.stage = 1;
+                                part2Video.visible = true;
+                                part2Video.play();
                             }
                         }
                     }
@@ -115,18 +140,18 @@ Scope {
                     visible: false
                     onPositionChanged: {
                         if (duration > 0 && position >= duration - 50 && overlay.stage === 1) {
-                            visible = false
-                            overlay.stage = 2
-                            part3Video.visible = true
-                            part3Video.play()
+                            visible = false;
+                            overlay.stage = 2;
+                            part3Video.visible = true;
+                            part3Video.play();
                         }
                     }
                     onPlaybackStateChanged: {
                         if (playbackState === MediaPlayer.StoppedState && overlay.stage === 1) {
-                            visible = false
-                            overlay.stage = 2
-                            part3Video.visible = true
-                            part3Video.play()
+                            visible = false;
+                            overlay.stage = 2;
+                            part3Video.visible = true;
+                            part3Video.play();
                         }
                     }
                 }
@@ -153,59 +178,25 @@ Scope {
                     visible: overlay.stage >= 1
                     z: 10
 
-                    component PowerItem: Item {
-                        id: powerItemRoot
-                        required property string normalIcon
-                        required property string hoverIcon
-                        required property var action
-                        property real itemRotation: 0
-                        property int offsetY: 0
-
-                        x: 30
-                        y: offsetY
-                        width: 900
-                        height: 350
-                        rotation: itemRotation
-                        property bool hovered: false
-                        scale: hovered ? 1.1 : 1.0
-                        transformOrigin: Item.Center
-                        Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-
-                        Image {
-                            anchors.fill: parent
-                            fillMode: Image.PreserveAspectFit
-                            source: powerItemRoot.hovered ? powerItemRoot.hoverIcon : powerItemRoot.normalIcon
-                        }
-                        MouseArea {
-                            anchors.centerIn: parent
-                            width: parent.width * 0.4
-                            height: parent.height * 0.4
-                            hoverEnabled: true
-                            onEntered: powerItemRoot.hovered = true
-                            onExited:  powerItemRoot.hovered = false
-                            onClicked: powerItemRoot.action()
-                        }
-                    }
-
                     PowerItem {
                         offsetY: -75
                         itemRotation: 3
                         normalIcon: Qt.resolvedUrl("../Assets/iconpack/shutdown.png")
-                        hoverIcon:  Qt.resolvedUrl("../Assets/iconpack/shutdown1.png")
+                        hoverIcon: Qt.resolvedUrl("../Assets/iconpack/shutdown1.png")
                         action: () => poweroffProcess.running = true
                     }
                     PowerItem {
                         offsetY: 100
                         itemRotation: -5
                         normalIcon: Qt.resolvedUrl("../Assets/iconpack/restart.png")
-                        hoverIcon:  Qt.resolvedUrl("../Assets/iconpack/restart1.png")
+                        hoverIcon: Qt.resolvedUrl("../Assets/iconpack/restart1.png")
                         action: () => restartProcess.running = true
                     }
                     PowerItem {
                         offsetY: 300
                         itemRotation: -12
                         normalIcon: Qt.resolvedUrl("../Assets/iconpack/logout.png")
-                        hoverIcon:  Qt.resolvedUrl("../Assets/iconpack/logout1.png")
+                        hoverIcon: Qt.resolvedUrl("../Assets/iconpack/logout1.png")
                         action: () => logoutProcess.running = true
                     }
                 }
@@ -220,14 +211,53 @@ Scope {
                         z: -1
                         onClicked: hideAnimation.start()
                     }
-                    Keys.onPressed: (event) => {
+                    Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
-                            hideAnimation.start()
-                            event.accepted = true
+                            hideAnimation.start();
+                            event.accepted = true;
                         }
                     }
                 }
             }
+        }
+    }
+
+    component PowerItem: Item {
+        id: powerItemRoot
+        required property string normalIcon
+        required property string hoverIcon
+        required property var action
+        property real itemRotation: 0
+        property int offsetY: 0
+
+        x: 30
+        y: offsetY
+        width: 900
+        height: 350
+        rotation: itemRotation
+        property bool hovered: false
+        scale: hovered ? 1.1 : 1.0
+        transformOrigin: Item.Center
+        Behavior on scale {
+            NumberAnimation {
+                duration: 200
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        Image {
+            anchors.fill: parent
+            fillMode: Image.PreserveAspectFit
+            source: powerItemRoot.hovered ? powerItemRoot.hoverIcon : powerItemRoot.normalIcon
+        }
+        MouseArea {
+            anchors.centerIn: parent
+            width: parent.width * 0.4
+            height: parent.height * 0.4
+            hoverEnabled: true
+            onEntered: powerItemRoot.hovered = true
+            onExited: powerItemRoot.hovered = false
+            onClicked: powerItemRoot.action()
         }
     }
 }

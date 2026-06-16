@@ -8,20 +8,20 @@ import "./Layers" as Lay
 import "./Widgets" as Wid
 
 ShellRoot {
-  Variants {
-    model: Quickshell.screens
-    Scope {
-      id: scopeRoot
-      required property ShellScreen modelData
-      Wid.WallpaperEngine {
-        modelData: scopeRoot.modelData
-      }
+    Variants {
+        model: Quickshell.screens
+        Scope {
+            id: scopeRoot
+            required property ShellScreen modelData
+            Wid.WallpaperEngine {
+                modelData: scopeRoot.modelData
+            }
+        }
     }
-  }
-  Lay.Capsule {}
-  //Lay.Datee {}
-  Lay.AppDrawer {}
-  Lay.VolumeOsd {}
-  Lay.BrightnessOsd {}
-  Lay.Searchapp {}
+    Lay.Capsule {}
+    //Lay.Datee {}
+    Lay.AppDrawer {}
+    Lay.VolumeOsd {}
+    Lay.BrightnessOsd {}
+    Lay.Searchapp {}
 }

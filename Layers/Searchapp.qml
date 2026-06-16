@@ -7,416 +7,380 @@ import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Io
 import QtQuick.Effects
-import "Vitreus/be/effects" as Effects
-import "Vitreus/be/glass" as GlassEffect
+
+import qs.Widgets as Wid
 
 Scope {
     id: root
-    
-    
     property bool forcedOpen: false
 
     IpcHandler {
         target: "searchapp"
         function toggle() {
-             root.forcedOpen = !root.forcedOpen
+            root.forcedOpen = !root.forcedOpen;
         }
         function open() {
-             root.forcedOpen = true
+            root.forcedOpen = true;
         }
         function close() {
-             root.forcedOpen = false
+            root.forcedOpen = false;
         }
     }
 
     Variants {
         model: Quickshell.screens
-        
+
         PanelWindow {
             id: window
             property var modelData
             screen: modelData
-            
-            visible: root.forcedOpen 
-
+            visible: root.forcedOpen
             anchors {
                 top: true
                 left: true
                 bottom: true
             }
-
-            implicitWidth: contentItem.width + 20
-            
-            color: "transparent" 
+            implicitWidth: 450
+            color: "transparent"
             WlrLayershell.layer: WlrLayer.Top
             WlrLayershell.namespace: "searchapp"
-            WlrLayershell.keyboardFocus: contentItem.visible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            WlrLayershell.keyboardFocus: root.forcedOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
             WlrLayershell.exclusionMode: ExclusionMode.Ignore
 
+            property var filteredApps: {
+                const stxt = search ? search.text.toLowerCase() : "";
+                if (stxt === "")
+                    return DesktopEntries.applications.values;
+                return DesktopEntries.applications.values.filter(app => {
+                    const ntxt = app.name.toLowerCase();
+                    let ni = 0;
+                    for (let si = 0; si < stxt.length; ++si) {
+                        const sc = stxt[si];
+                        while (ni < ntxt.length) {
+                            if (ntxt[ni++] == sc)
+                                break;
+                            if (ni == ntxt.length)
+                                return false;
+                        }
+                    }
+                    return true;
+                });
+            }
+            Wid.P3rTransitionApp {
+                id: appTransition
+                targetScreen: window.screen
+            }
             Timer {
                 id: focusTimer
                 interval: 50
                 repeat: false
                 onTriggered: {
                     if (window.visible) {
-                        search.forceActiveFocus()
-                        carousel.currentIndex = 0
+                        search.forceActiveFocus();
+                        appList.currentIndex = 0;
                     }
                 }
             }
 
-            Behavior on width {
-                NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+            onVisibleChanged: {
+                if (visible) {
+                    search.text = "";
+                    focusTimer.restart();
+                }
             }
 
+            // ── Outer skewed panel ──
             Item {
-                id: contentItem
-                
+                id: panelRoot
                 anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
                 anchors.leftMargin: 50
+                anchors.verticalCenter: parent.verticalCenter
+                width: 380
+                height: 700
 
-                width: 300 + searchContainer.implicitWidth
-                height: 900
-
-                onVisibleChanged: {
-                    if (visible) {
-                        search.text = ""
-                        focusTimer.restart()
+                // white border outline
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: -3
+                    color: "transparent"
+                    border.color: "#ffffff"
+                    border.width: 3
+                    radius: 6
+                    transform: Matrix4x4 {
+                        matrix: Qt.matrix4x4(1, -0.04, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
                     }
                 }
 
-                RowLayout {
+                // dark background
+                Rectangle {
                     anchors.fill: parent
-                    spacing: 10
-
-                    Item {
-                        id: carousel
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-                        Layout.leftMargin: -90
-                        
-                        property int currentIndex: 0
-                        property real arcRadius: 150
-                        property real arcAngleSpan: 100
-                        
-                        property var filteredApps: {
-                            const stxt = search.text.toLowerCase();
-                            if (stxt === "") {
-                                return DesktopEntries.applications.values;
-                            }
-                            
-                            return DesktopEntries.applications.values.filter(app => {
-                                const ntxt = app.name.toLowerCase();
-                                let ni = 0;
-                                for (let si = 0; si < stxt.length; ++si) {
-                                    const sc = stxt[si];
-                                    while (ni < ntxt.length) {
-                                        if (ntxt[ni++] == sc) break;
-                                        if (ni == ntxt.length) return false;
-                                    }
-                                }
-                                return true;
-                            });
-                        }
-Rectangle {
-    id: glassArc
-    anchors.centerIn: parent
-    anchors.horizontalCenterOffset: -carousel.arcRadius * 0.85
-    width: (carousel.arcRadius + 50) * 2
-    height: (carousel.arcRadius + 50) * 2
-    radius: carousel.arcRadius + 30
-    z: -1
-    
-    color: Qt.rgba(15/255, 15/255, 15/255, 0.4)
-}
-                        MouseArea {
-                            anchors.fill: parent
-                            propagateComposedEvents: true
-                            hoverEnabled: true
-                            
-                            onWheel: wheel => {
-                                if (wheel.angleDelta.y > 0) {
-                                    carousel.currentIndex = Math.max(0, carousel.currentIndex - 1)
-                                } else {
-                                    carousel.currentIndex = Math.min(carousel.filteredApps.length - 1, carousel.currentIndex + 1)
-                                }
-                                wheel.accepted = true
-                            }
-                        }
-
-                        Repeater {
-                            model: carousel.filteredApps
-                            
-                            Item {
-                                id: appDelegate
-                                
-                                required property var modelData
-                                required property int index
-                                
-                                property int relativePos: index - carousel.currentIndex
-                                visible: Math.abs(relativePos) <= 1
-                                
-                                property real angle: relativePos * carousel.arcAngleSpan
-                                property real angleRad: angle * Math.PI / 180
-                                
-                                x: 120 - (1 - Math.cos(angleRad)) * carousel.arcRadius * 0.3
-                                y: carousel.height / 2 + Math.sin(angleRad) * carousel.arcRadius - 45
-                                
-                                Behavior on x { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-                                Behavior on y { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
-                                
-                                width: 80
-                                height: 80
-                                
-                                property bool isHovered: false
-                                property bool isCenter: relativePos === 0
-                                property real baseScale: isCenter ? 1.3 : 0.85
-                                property real hoverScale: isHovered ? 1.15 : 1.0
-
-                                Rectangle {
-                                    id: dropShadow
-                                    visible: appDelegate.isCenter || appDelegate.isHovered
-                                    anchors.centerIn: parent
-                                    width: 100
-                                    height: 100
-                                    radius: 35
-                                    color: "transparent"
-                                    z: 0
-                                    
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.margins: -8
-                                        radius: 40
-                                        color: "#20000000"
-                                        z: -3
-                                    }
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.margins: -5
-                                        radius: 38
-                                        color: "#30000000"
-                                        z: -2
-                                    }
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        anchors.margins: -2
-                                        radius: 36
-                                        color: "#40000000"
-                                        z: -1
-                                    }
-                                    
-                                    transform: Scale {
-                                        origin.x: dropShadow.width / 2
-                                        origin.y: dropShadow.height / 2
-                                        xScale: appDelegate.baseScale * appDelegate.hoverScale
-                                        yScale: appDelegate.baseScale * appDelegate.hoverScale
-                                        
-                                        Behavior on xScale { NumberAnimation { duration: 150 } }
-                                        Behavior on yScale { NumberAnimation { duration: 150 } }
-                                    }
-                                    
-                                    rotation: appDelegate.isCenter ? +5 : appDelegate.angle * 1.5
-                                    Behavior on rotation { NumberAnimation { duration: 200 } }
-                                }
-                                
-                                Rectangle {
-                                    id: appButton
-                                    anchors.centerIn: parent
-                                    width: 90
-                                    height: 90
-                                    color: Dat.Colors.color2
-                                    radius: 30
-                                    opacity: appDelegate.isCenter ? 1.0 : 0.8
-                                    z: 1
-                                    
-                                    transform: Scale {
-                                        origin.x: appButton.width / 2
-                                        origin.y: appButton.height / 2
-                                        xScale: appDelegate.baseScale * appDelegate.hoverScale
-                                        yScale: appDelegate.baseScale * appDelegate.hoverScale
-                                        
-                                        Behavior on xScale { NumberAnimation { duration: 150 } }
-                                        Behavior on yScale { NumberAnimation { duration: 150 } }
-                                    }
-                                    
-                                    rotation: appDelegate.isCenter ? +5 : appDelegate.angle * 1.5
-                                    Behavior on rotation { NumberAnimation { duration: 200 } }
-                                    
-                                    Rectangle {
-                                        id: fallbackBg
-                                        anchors.fill: parent
-                                        radius: 25
-                                        visible: appIcon.status !== Image.Ready
-                                        color: Dat.Colors.color2
-                                        z: 1
-                                        
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: appDelegate.modelData.name ? appDelegate.modelData.name.charAt(0).toUpperCase() : "?"
-                                            font.pixelSize: 24
-                                            font.weight: Font.Bold
-                                            color: "#ffffff"
-                                        }
-                                    }
-
-                                    Image {
-                                        id: appIcon
-                                        anchors.centerIn: parent
-                                        width: 55
-                                        height: 50
-                                        source: appDelegate.modelData.icon ? "image://icon/" + appDelegate.modelData.icon : ""
-                                        sourceSize.width: 60
-                                        sourceSize.height: 60
-                                        fillMode: Image.PreserveAspectFit
-                                        visible: status === Image.Ready
-                                        smooth: true
-                                        z: 2
-                                    }
-                                    
-                                    MouseArea {
-                                        id: appMouseArea
-                                        anchors.fill: parent
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        
-                                        property bool isClicking: false
-                                        
-                                        onClicked: {
-                                            if (isClicking) return
-                                            isClicking = true
-                                            
-                                            clickAnimation.start()
-                                            Qt.callLater(function() {
-                                                appDelegate.modelData.execute()
-                                                if (root.forcedOpen) root.forcedOpen = false
-                                                isClicking = false
-                                            })
-                                        }
-                                        
-                                        onEntered: {
-                                            if (!isClicking) {
-                                                appDelegate.isHovered = true
-                                                carousel.currentIndex = appDelegate.index
-                                            }
-                                        }
-                                        
-                                        onExited: {
-                                            if (!isClicking) {
-                                                appDelegate.isHovered = false
-                                            }
-                                        }
-                                    }
-                                    
-                                    SequentialAnimation {
-                                        id: clickAnimation
-                                        NumberAnimation {
-                                            target: appButton
-                                            property: "scale"
-                                            to: 0.85
-                                            duration: 100
-                                            easing.type: Easing.OutQuad
-                                        }
-                                        NumberAnimation {
-                                            target: appButton
-                                            property: "scale"
-                                            to: 1.0
-                                            duration: 100
-                                            easing.type: Easing.OutQuad
-                                        }
-                                    }
-                                }
-                                
-                                Rectangle {
-                                    visible: appDelegate.isCenter
-                                    color: Dat.Colors.color9
-                                    radius: 6
-                                    width: tooltipText.width + 16
-                                    height: tooltipText.height + 10
-                                    z: 10
-                                    rotation: -2
-                                    
-                                    anchors {
-                                        left: parent.right
-                                        leftMargin: 45
-                                        verticalCenter: parent.verticalCenter
-                                    }
-                                    
-                                    Text {
-                                        id: tooltipText
-                                        anchors.centerIn: parent
-                                        text: appDelegate.modelData.name || ""
-                                        color: "#ffffff"
-                                        font.pixelSize: 14
-                                    }
-                                }
-                            }
-                        }
+                    color: "#111827"
+                    radius: 4
+                    opacity: 0.97
+                    transform: Matrix4x4 {
+                        matrix: Qt.matrix4x4(1, -0.04, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
                     }
+                }
 
-                    Rectangle {
-                        id: searchContainer
-                        Layout.alignment: Qt.AlignVCenter
-                        implicitWidth: 0
-                        implicitHeight: 0
-                        visible: false
-                        color:"transparent"
-                        border.width:3
-                        radius: 3
-                        border.color:Dat.Colors.color3
+                Column {
+                    anchors.fill: parent
+                    anchors.margins: 0
+                    spacing: 0
 
-                        RowLayout {
-                            id: searchbox
-                            anchors.fill: parent
-                            anchors.margins: 5
+                    // ── Header ──
+                    Item {
+                        width: parent.width
+                        height: 80
 
-                            IconImage {
-                                implicitSize: parent.height
-                                source: "root:icons/magnifying-glass.svg" 
+                        // blue triangle accent
+                        Canvas {
+                            anchors.left: parent.left
+                            anchors.leftMargin: 20
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 160
+                            height: 50
+                            onPaint: {
+                                var ctx = getContext("2d");
+                                ctx.clearRect(0, 0, width, height);
+                                ctx.beginPath();
+                                ctx.moveTo(0, 0);
+                                ctx.lineTo(width, 0);
+                                ctx.lineTo(width - 20, height);
+                                ctx.lineTo(0, height);
+                                ctx.closePath();
+                                ctx.fillStyle = "#1a6aff";
+                                ctx.fill();
                             }
+
+                            Text {
+                                anchors.centerIn: parent
+                                text: "APPS"
+                                font.pixelSize: 22
+                                font.bold: true
+                                color: "#ffffff"
+                                font.letterSpacing: 3
+                            }
+                        }
+
+                        // search input
+                        Rectangle {
+                            anchors.right: parent.right
+                            anchors.rightMargin: 16
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: 160
+                            height: 32
+                            color: "transparent"
+                            border.color: "#1a6aff"
+                            border.width: 1
+                            radius: 3
 
                             TextInput {
                                 id: search
-                                Layout.fillWidth: true
-                                color: "white"
+                                anchors.fill: parent
+                                anchors.leftMargin: 10
+                                anchors.rightMargin: 10
+                                color: "#ffffff"
+                                verticalAlignment: TextInput.AlignVCenter
+                                font.pixelSize: 13
+                                clip: true
 
-                                focus: true
-                                Keys.onEscapePressed: {
-                                     if (root.forcedOpen) root.forcedOpen = false
+                                Text {
+                                    anchors.fill: parent
+                                    verticalAlignment: Text.AlignVCenter
+                                    text: "Search..."
+                                    color: "#44ffffff"
+                                    font.pixelSize: 13
+                                    visible: search.text === ""
                                 }
 
+                                Keys.onEscapePressed: root.forcedOpen = false
                                 Keys.onPressed: event => {
-                                    if (event.key == Qt.Key_Left || event.key == Qt.Key_Up) {
-                                        carousel.currentIndex = carousel.currentIndex == 0 ? carousel.filteredApps.length - 1 : carousel.currentIndex - 1;
+                                    if (event.key === Qt.Key_Up) {
+                                        appList.currentIndex = Math.max(0, appList.currentIndex - 1);
                                         event.accepted = true;
-                                    } else if (event.key == Qt.Key_Right || event.key == Qt.Key_Down) {
-                                        carousel.currentIndex = carousel.currentIndex == carousel.filteredApps.length - 1 ? 0 : carousel.currentIndex + 1;
+                                    } else if (event.key === Qt.Key_Down) {
+                                        appList.currentIndex = Math.min(filteredApps.length - 1, appList.currentIndex + 1);
                                         event.accepted = true;
-                                    } else if (event.modifiers & Qt.ControlModifier) {
-                                        if (event.key == Qt.Key_J) {
-                                            carousel.currentIndex = carousel.currentIndex == carousel.filteredApps.length - 1 ? 0 : carousel.currentIndex + 1;
-                                            event.accepted = true;
-                                        } else if (event.key == Qt.Key_K) {
-                                            carousel.currentIndex = carousel.currentIndex == 0 ? carousel.filteredApps.length - 1 : carousel.currentIndex - 1;
-                                            event.accepted = true;
+                                    }
+                                }
+                                onAccepted: {
+                                    if (filteredApps.length > 0) {
+                                        filteredApps[appList.currentIndex].execute();
+                                        root.forcedOpen = false;
+                                    }
+                                }
+                                onTextChanged: appList.currentIndex = 0
+                            }
+                        }
+                    }
+
+                    // blue divider line
+                    Rectangle {
+                        width: parent.width
+                        height: 2
+                        color: "#1a6aff"
+                        opacity: 0.6
+                    }
+
+                    // ── App list ──
+                    ListView {
+                        id: appList
+                        width: parent.width
+                        height: panelRoot.height - 82
+                        clip: true
+                        currentIndex: 0
+                        model: filteredApps
+
+                        ScrollBar.vertical: ScrollBar {
+                            policy: ScrollBar.AsNeeded
+                            contentItem: Rectangle {
+                                implicitWidth: 4
+                                color: "#1a6aff"
+                                opacity: 0.6
+                                radius: 2
+                            }
+                        }
+
+                        delegate: Item {
+                            id: delegateRoot
+                            required property var modelData
+                            required property int index
+                            width: appList.width
+                            height: 80
+
+                            property bool isActive: appList.currentIndex === index
+
+                            // active highlight
+                            Rectangle {
+                                anchors.fill: parent
+                                color: delegateRoot.isActive ? "#ffffff" : "transparent"
+                                opacity: delegateRoot.isActive ? 1 : 0
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: 150
+                                    }
+                                }
+                            }
+
+                            // blue left accent on active
+                            Rectangle {
+                                anchors.left: parent.left
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                width: 4
+                                color: "#1a6aff"
+                                visible: delegateRoot.isActive
+                            }
+
+                            Row {
+                                anchors.fill: parent
+                                anchors.leftMargin: 0
+                                spacing: 0
+
+                                // app icon
+                                Item {
+                                    width: 56
+                                    height: parent.height
+
+                                    Rectangle {
+                                        anchors.centerIn: parent
+                                        width: 48
+                                        height: 48
+                                        color: delegateRoot.isActive ? "#1a6aff" : "#1e2a3a"
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 150
+                                            }
+                                        }
+
+                                        Image {
+                                            anchors.fill: parent
+                                            anchors.margins: 6
+                                            source: delegateRoot.modelData.icon ? "image://icon/" + delegateRoot.modelData.icon : ""
+                                            fillMode: Image.PreserveAspectFit
+                                            smooth: true
+                                            visible: status === Image.Ready
+                                        }
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: delegateRoot.modelData.name ? delegateRoot.modelData.name.charAt(0).toUpperCase() : "?"
+                                            color: "#ffffff"
+                                            font.pixelSize: 18
+                                            font.bold: true
+                                            visible: parent.children[0].status !== Image.Ready
                                         }
                                     }
                                 }
 
-                                onAccepted: {
-                                    if (carousel.filteredApps.length > 0 && carousel.currentIndex >= 0 && carousel.currentIndex < carousel.filteredApps.length) {
-                                        carousel.filteredApps[carousel.currentIndex].execute();
-                                        if (root.forcedOpen) root.forcedOpen = false;
+                                // app name + description
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 4
+                                    width: parent.width - 36 - 56 - 16
+
+                                    Row {
+                                        spacing: 6
+
+                                        Text {
+                                            text: delegateRoot.modelData.name || ""
+                                            font.pixelSize: 15
+                                            font.bold: true
+                                            color: delegateRoot.isActive ? "#111111" : "#ffffff"
+                                            Behavior on color {
+                                                ColorAnimation {
+                                                    duration: 150
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Text {
+                                        text: delegateRoot.modelData.comment || delegateRoot.modelData.genericName || ""
+                                        font.pixelSize: 12
+                                        color: delegateRoot.isActive ? "#333333" : "#7dd4fc"
+                                        elide: Text.ElideRight
+                                        width: parent.width
+                                        Behavior on color {
+                                            ColorAnimation {
+                                                duration: 150
+                                            }
+                                        }
                                     }
                                 }
+                            }
 
-                                onTextChanged: {
-                                    carousel.currentIndex = 0;
+                            // bottom divider
+                            Rectangle {
+                                anchors.bottom: parent.bottom
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.leftMargin: 36
+                                height: 1
+                                color: "#ffffff"
+                                opacity: 0.08
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onEntered: appList.currentIndex = delegateRoot.index
+                                onClicked: {
+                                    delegateRoot.modelData.execute();
+                                    root.forcedOpen = false;
                                 }
                             }
                         }
                     }
                 }
+            }
+
+            // click outside to close
+            MouseArea {
+                anchors.fill: parent
+                z: -1
+                onClicked: root.forcedOpen = false
             }
         }
     }
