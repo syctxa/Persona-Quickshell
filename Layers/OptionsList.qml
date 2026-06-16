@@ -176,8 +176,11 @@ Item {
         ]
 
         Rectangle {
-            anchors.fill: parent
-            color: "#1a1d24"
+          anchors.fill: parent
+          gradient: Gradient {
+            GradientStop { position: 0.0; color: "#f50f1c69" }
+            GradientStop { position: 1.0; color: "#f7081044" }
+          }
         }
 
         Rectangle {
@@ -271,7 +274,7 @@ Item {
             }
         }
 
-// ── shader toggle button (formerly the static "lower" text bar) ──
+        // ── shader toggle button (formerly the static "lower" text bar) ──
         Rectangle {
             id: lowerBar
             anchors.top: upperBar.bottom
@@ -280,7 +283,7 @@ Item {
             anchors.rightMargin: parent.width * 0.05
             width: parent.width * 0.60
             height: parent.height * 0.20
-            color: revealRoot.activeShaderIndex === revealRoot.localTab ? "#264a8fff" : "#eb000000"
+            color: revealRoot.activeShaderIndex === revealRoot.localTab ? "#994a8fff" : "#eb000000"
             border.color: revealRoot.activeShaderIndex === revealRoot.localTab ? "#4a8fff" : "#26ffffff"
             border.width: 1
             transformOrigin: Item.Center
