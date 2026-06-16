@@ -17,6 +17,7 @@ Scope {
       screen: root.targetScreen
       color: "transparent"
       WlrLayershell.layer: WlrLayer.Overlay
+      WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
       WlrLayershell.exclusionMode: ExclusionMode.Ignore
       anchors { left: true; right: true; top: true; bottom: true }
 
@@ -138,7 +139,6 @@ Scope {
               ScriptAction {
                 script: {
                   if (blockItem.index === 2) {
-                    root.shouldShow = false
                     root.finished()
                   }
                 }

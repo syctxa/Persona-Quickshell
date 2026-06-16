@@ -146,14 +146,14 @@ Scope {
             height: 300
             visible: mainCircle.visible
             Connections {
-              target: optionsTransition
-              function onPeaked() {
-                optionsLayer.targetScreen = optionsTransition.targetScreen
-                optionsLayer.shouldShow = true
-              }
-              function onFinished() {
-                optionsTransition.shouldShow = false
-              }
+                target: optionsTransition
+                function onPeaked() {
+                    optionsLayer.targetScreen = optionsTransition.targetScreen
+                    optionsLayer.shouldShow = true
+                }
+                function onFinished() {
+                    optionsTransition.shouldShow = false
+                }
             }
             Repeater {
               model: [
