@@ -59,10 +59,8 @@ hl.bind(
 
 ---
 
-## Credits:
-the greyscale shader is from:
-https://github.com/snes19xx/surface-dots/blob/main/.config/hypr/shaders/reading_mode.glsl
-@snes19xx
+## Credits
+The greyscale shader is from [@snes19xx](https://github.com/snes19xx)'s [surface-dots](https://github.com/snes19xx/surface-dots/blob/main/.config/hypr/shaders/reading_mode.glsl).
 
 
 ## Power Menu
