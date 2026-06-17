@@ -1,6 +1,6 @@
-<h1 align=center>Persona Quickshell</h1>
+<h1 align="center">Persona Quickshell</h1>
 
-<div align=center>
+<div align="center">
 
 [![QML](https://img.shields.io/badge/QML-Quickshell-7aa2f7?style=for-the-badge&logo=qt&logoColor=white)](https://quickshell.outfoxxed.me)
 [![Stars](https://img.shields.io/github/stars/Yujonpradhananga/Persona-Quickshell-?style=for-the-badge&color=e0af68&logoColor=white)](https://github.com/Yujonpradhananga/Persona-Quickshell-/stargazers)
@@ -9,28 +9,20 @@
 
 </div>
 
-
-
-
-
 <https://github.com/user-attachments/assets/084343ed-a010-4a0a-b953-eda97157b9e6>
 
+---
 
+## Dependencies
 
+### Plugins
 
+A custom cava plugin is used here:
+**Link:** <https://github.com/Yujonpradhananga/Qt6-Cava-plugin>
 
+You can build the plugin mannually or if you dont want to mannually build it and go through the installation process you can delete the `CavaVisualizer.qml` file and delete these lines 171-180 from the `WallpaperEngine.qml` file:
 
-#NOTE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-## plugins
-
-
-a custom cava plugin is used here:
-
-Link: <https://github.com/Yujonpradhananga/Qt6-Cava-plugin>
-
-You can build the plugin mannually or if you dont want to mannually build it and go through the installation process you can delete the CavaVisualizer.qml file and delete these lines 171-180 from the WallpaperEngine.qml file:
-
-``
+```qml
 //delete these
 CavaVisualizer {
   id: s1_cava
@@ -42,28 +34,36 @@ CavaVisualizer {
   }
   height: 555
 }
-``
+```
 
-## fonts used
+### Fonts Used
 
--Glirock. (for the time)
+- Glirock (for the time)
 
-# AppLauncher
+---
+
+## AppLauncher
 
 The AppLauncher requires a hyprland keybind for it to work.
-
 Mine is set like this:
-``
-hl.bind(
-	mainMod .. " + R",
-	hl.dsp.exec_cmd("qs -c /path to where you have installed the repo/Persona-Quickshell/ ipc call searchapp toggle")
-)
-``
-# Power menu
 
-the power menu currently uses loginctl commands, feel free to change them to your needs.
+```lua
+hl.bind(
+    mainMod .. " + R",
+    hl.dsp.exec_cmd("qs -c /path to where you have installed the repo/Persona-Quickshell/ ipc call searchapp toggle")
+)
+```
+
+---
+
+## Power Menu
+
+The power menu currently uses loginctl commands, feel free to change them to your needs.
+
+---
 
 ## License
 
 MIT License - feel free to use and modify as needed.
+
 Created by Yujon Pradhananga
