@@ -62,6 +62,9 @@ hl.bind(
 ## Credits
 The greyscale shader is from [@snes19xx](https://github.com/snes19xx)'s [surface-dots](https://github.com/snes19xx/surface-dots/blob/main/.config/hypr/shaders/reading_mode.glsl).
 
+The wallpaper is from : https://steamcommunity.com/sharedfiles/filedetails/?id=3151551777
+
+
 
 ## Power Menu
 
