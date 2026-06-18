@@ -9,7 +9,10 @@
 
 </div>
 
-<https://github.com/user-attachments/assets/084343ed-a010-4a0a-b953-eda97157b9e6>
+<https://github.com/user-attachments/assets/c7349c24-6107-44d4-912e-2ff23100945d>
+
+
+
 
 ---
 
@@ -56,6 +59,14 @@ hl.bind(
 
 ---
 
+## Credits
+The wallpaper is from : https://steamcommunity.com/sharedfiles/filedetails/?id=3151551777
+
+The greyscale shader is from [@snes19xx](https://github.com/snes19xx)'s [surface-dots](https://github.com/snes19xx/surface-dots/blob/main/.config/hypr/shaders/reading_mode.glsl).
+
+The media player's album art implementation is taken from [Rexcrazy804](https://github.com/Rexcrazy804)'s [Zaphkiel](https://github.com/Rexcrazy804/Zaphkiel).
+
+Shoutout to [blairxu13](https://github.com/blairxu13)'s [persona3-website](https://github.com/blairxu13/persona3-website).
 ## Power Menu
 
 The power menu currently uses loginctl commands, feel free to change them to your needs.
