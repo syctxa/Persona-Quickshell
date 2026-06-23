@@ -212,6 +212,14 @@ Scope {
                     Repeater {
                         model: [
                             {
+                                icon: "( •_•)",
+                                label: "Calendar",
+                                action: () => {
+                                    calendarLayer.targetScreen = panel.screen;
+                                    calendarLayer.shouldShow = true;
+                                }
+                            },
+                            {
                                 icon: "^▽^",
                                 label: "Stats",
                                 action: () => {
@@ -233,14 +241,6 @@ Scope {
                                 action: () => {
                                     p3rpause.targetScreen = panel.screen;
                                     p3rpause.shouldShow = true;
-                                }
-                            },
-                            {
-                                icon: "•́︿•̀",
-                                label: "Calendar",
-                                action: () => {
-                                    calendarLayer.targetScreen = panel.screen;
-                                    calendarLayer.shouldShow = true;
                                 }
                             }
                         ]
