@@ -144,7 +144,7 @@ Scope {
                     anchors.top: parent.top
                     anchors.topMargin: clockScope.vw * 5
                     anchors.right: parent.right
-                    anchors.rightMargin: clockScope.vw * 5.5
+                    anchors.rightMargin: clockScope.vw * 6
                     width: clockScope.vw * 5.5
                     text: Dat.Time.daytime
                     horizontalAlignment: Text.AlignHCenter

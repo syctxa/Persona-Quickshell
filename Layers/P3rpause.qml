@@ -46,33 +46,44 @@ Scope {
                 if (visible)
                     overlay.resetMenu();
             }
+
             Rectangle {
                 id: overlay
                 anchors.fill: parent
                 color: "transparent"
                 property int stage: 0
 
+                Component.onCompleted: {
+                    part2Video.play();
+                    part2Video.pause();
+                    part2Video.seek(0);
+                    part3Video.play();
+                    part3Video.pause();
+                    part3Video.seek(0);
+                }
+
                 function resetMenu() {
                     stage = 0;
                     opacity = 1;
-                    pngSequence.visible = false;
+
                     pngSequence.currentFrame = 0;
+                    pngSequence.visible = true;
+
                     part2Video.stop();
                     part2Video.visible = false;
                     part2Video.seek(0);
                     part3Video.stop();
                     part3Video.visible = false;
                     part3Video.seek(0);
-                    startDelay.start();
-                }
-                Timer {
-                    id: startDelay
-                    interval: 80
-                    repeat: false
-                    onTriggered: {
-                        pngSequence.visible = true;
-                        frameAnimation.start();
-                    }
+
+                    part2Video.play();
+                    part2Video.pause();
+                    part2Video.seek(0);
+                    part3Video.play();
+                    part3Video.pause();
+                    part3Video.seek(0);
+
+                    frameAnimation.start();
                 }
 
                 NumberAnimation {
@@ -106,16 +117,11 @@ Scope {
                     property int frameRate: 60
                     source: Qt.resolvedUrl("../Assets/p3r menu/png/pngseq" + String(currentFrame).padStart(2, '0') + ".png")
 
-                    onStatusChanged: {
-                        if (status === Image.Ready && currentFrame === 0) {
-                            visible = true;
-                        }
-                    }
-
                     Timer {
                         id: frameAnimation
-                        interval: 17
+                        interval: 1000 / pngSequence.frameRate
                         repeat: true
+                        running: false
                         onTriggered: {
                             if (pngSequence.currentFrame < pngSequence.totalFrames - 1) {
                                 pngSequence.currentFrame++;

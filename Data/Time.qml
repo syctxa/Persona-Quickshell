@@ -35,8 +35,7 @@ Singleton {
     }
 
     readonly property string daytime: {
-        const labels = ["Dark Hour", "Early Hour", "Early Hour", "Early Hour", "Early Hour", "Dawn", "Dawn", "Morning", "Morning", "Morning", "Morning", "Noon", "Noon", "Noon", "Afternoon", "Afternoon", "Afternoon", "Afternoon", "Dusk", "Evening", "Night", "Night", "Late Night", "Late Night"];
-        return labels[now.getHours()];
+        return now.getDate() + ", " + now.getFullYear();
     }
 
     readonly property real moonPhaseDegree: {
