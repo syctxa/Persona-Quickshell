@@ -218,30 +218,31 @@ Scope {
 
         Item {
             visible: entryRoot.todayFlag
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            width: entryRoot.numSize * 1.1
+            anchors.left: parent.left - 109
+            anchors.verticalCenter: parent.verticalCenter * -10
+            width: entryRoot.numSize * 1.5
             height: width
-
             Rectangle {
                 anchors.centerIn: parent
-                width: entryRoot.numSize * 1.1
+                anchors.verticalCenterOffset: 7
+                width: entryRoot.numSize * 2.3
                 height: width
                 radius: width / 2
                 color: "transparent"
                 border.color: "#6490ff"
-                border.width: 2
+                border.width: 15
                 opacity: 0.6
             }
             Rectangle {
                 anchors.centerIn: parent
-                width: entryRoot.numSize * 0.88
+                anchors.verticalCenterOffset: 1
+                width: entryRoot.numSize * 1
                 height: width
                 radius: width / 2
                 color: "transparent"
                 border.color: "#6490ff"
-                border.width: 1
-                opacity: 0.35
+                border.width: 10
+                opacity: 0.6
             }
         }
 
