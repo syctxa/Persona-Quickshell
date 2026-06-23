@@ -19,6 +19,9 @@ Scope {
     Lay.Options {
         id: optionsLayer
     }
+    Lay.Calendar {
+        id: calendarLayer
+    }
     Wid.P3rTransition2 {
         id: optionsTransition
     }
@@ -218,7 +221,7 @@ Scope {
                             },
                             {
                                 icon: "╥_╥",
-                                label: "Stats",
+                                label: "Shaders",
                                 action: () => {
                                     optionsLayer.targetScreen = panel.screen;
                                     optionsLayer.shouldShow = true;
@@ -230,6 +233,14 @@ Scope {
                                 action: () => {
                                     p3rpause.targetScreen = panel.screen;
                                     p3rpause.shouldShow = true;
+                                }
+                            },
+                            {
+                                icon: "•́︿•̀",
+                                label: "Calendar",
+                                action: () => {
+                                    calendarLayer.targetScreen = panel.screen;
+                                    calendarLayer.shouldShow = true;
                                 }
                             }
                         ]

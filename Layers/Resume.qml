@@ -98,19 +98,19 @@ Scope {
                             {
                                 badge: "I",
                                 title: "Stats",
-                                subtitle: "Repositories / Activity",
+                                subtitle: "System Stats and Info",
                                 rank: 3
                             },
                             {
                                 badge: "II",
                                 title: "Network",
-                                subtitle: "Languages & Frameworks",
+                                subtitle: "Wifi Networks and connections",
                                 rank: 4
                             },
                             {
                                 badge: "III",
                                 title: "Bluetooth",
-                                subtitle: "Featured Work",
+                                subtitle: "Bluetooth Devices",
                                 rank: 5
                             },
                         ]
@@ -441,24 +441,7 @@ Scope {
                                         ] : Info.BluetoothInfo.friendlyDeviceList.map(d => ({
                                                     title: d.name,
                                                     status: d.connected ? "Connected" : (d.paired ? "Paired" : "Found")
-                                                })), [
-                                            {
-                                                title: "Open Source",
-                                                status: "Active"
-                                            },
-                                            {
-                                                title: "Quickshell Themes",
-                                                status: "Ongoing"
-                                            },
-                                            {
-                                                title: "NixOS Configs",
-                                                status: "Active"
-                                            },
-                                            {
-                                                title: "Shader Research",
-                                                status: "Ongoing"
-                                            },
-                                        ],][ac];
+                                                })), [],][ac];
                                 }
 
                                 Item {
