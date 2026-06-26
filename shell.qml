@@ -3,8 +3,8 @@
 pragma ComponentBehavior: Bound
 import Quickshell
 import QtQuick
-import "./Layers" as Lay
-import "./Widgets" as Wid
+import qs.Layers as Lay
+import qs.Widgets as Wid
 
 ShellRoot {
     Variants {
