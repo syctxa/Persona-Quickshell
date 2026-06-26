@@ -11,7 +11,7 @@ Scope {
     property var targetScreen: null
     property bool contentVisible: false
 
-    Wid.P3rTransition2 {
+    Wid.P3rTransition3 {
         id: calTransition
     }
 
