@@ -3,6 +3,7 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Effects
 import "../Data" as Dat
+import qs.Widgets.Info as Info
 
 Scope {
     id: clockScope
@@ -104,7 +105,7 @@ Scope {
                     id: weekdayText
                     z: 50
                     anchors.top: parent.top
-                    anchors.topMargin: clockScope.vw * 3.3
+                    anchors.topMargin: clockScope.vw * 3.5
                     anchors.right: parent.right
                     anchors.rightMargin: clockScope.vw * 9
                     width: clockScope.vw * 2
@@ -127,12 +128,11 @@ Scope {
                     anchors.right: parent.right
                     anchors.rightMargin: clockScope.vw * 6
                     width: clockScope.vw * 5
-                    text: Dat.Time.moonPhaseName
+                    text: Info.BatteryInfo.icon + " " + Info.BatteryInfo.percentageString
+                    font.family: "JetBrainsMono Nerd Font"
                     horizontalAlignment: Text.AlignHCenter
-                    font.family: "SimHei"
-                    font.pixelSize: clockScope.vw * 1.1458
+                    font.pixelSize: clockScope.vw * 1.5
                     font.weight: Font.Bold
-                    font.letterSpacing: clockScope.vw * 0.0521
                     color: "#fffb9f"
                     style: Text.Raised
                     styleColor: "#635400d9"
@@ -144,7 +144,7 @@ Scope {
                     anchors.top: parent.top
                     anchors.topMargin: clockScope.vw * 5
                     anchors.right: parent.right
-                    anchors.rightMargin: clockScope.vw * 6
+                    anchors.rightMargin: clockScope.vw * 6.5
                     width: clockScope.vw * 5.5
                     text: Dat.Time.daytime
                     horizontalAlignment: Text.AlignHCenter

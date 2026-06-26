@@ -35,8 +35,14 @@ Singleton {
     }
 
     readonly property string daytime: {
-        const labels = ["Dark Hour", "Early Hour", "Early Hour", "Early Hour", "Early Hour", "Dawn", "Dawn", "Morning", "Morning", "Morning", "Morning", "Noon", "Noon", "Noon", "Afternoon", "Afternoon", "Afternoon", "Afternoon", "Dusk", "Evening", "Night", "Night", "Late Night", "Late Night"];
-        return labels[now.getHours()];
+        const h = now.getHours();
+        if (h >= 5 && h < 12)
+            return "Dawn";
+        if (h >= 12 && h < 17)
+            return "Noon";
+        if (h >= 17 && h < 21)
+            return "Dusk";
+        return "Dark";
     }
 
     readonly property real moonPhaseDegree: {
@@ -50,12 +56,5 @@ Singleton {
         if (degree >= 175 && degree <= 185)
             return 180;
         return degree;
-    }
-
-    readonly property string moonPhaseName: {
-        const phases = ["NEW", "CRESCENT", "QUARTER", "GIBBOUS", "FULL", "GIBBOUS", "QUARTER", "CRESCENT"];
-        if (moonPhaseDegree >= 337.5)
-            return phases[0];
-        return phases[Math.floor((moonPhaseDegree + 22.5) / 45)];
     }
 }
