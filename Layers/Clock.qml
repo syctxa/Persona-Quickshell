@@ -2,8 +2,8 @@ import Quickshell
 import Quickshell.Wayland
 import QtQuick
 import QtQuick.Effects
-import "../Data" as Dat
-import qs.Widgets.Info as Info
+import qs.Data as Dat
+import qs.Services as Info
 
 Scope {
     id: clockScope

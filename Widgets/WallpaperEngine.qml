@@ -168,7 +168,7 @@ WlrLayershell {
             fragmentShader: Qt.resolvedUrl("../Assets/shaders/motion/motion.frag.qsb")
         }
 
-        CavaVisualizer {
+        /*CavaVisualizer {
             id: s1_cava
             anchors {
                 left: parent.left
@@ -177,7 +177,7 @@ WlrLayershell {
                 topMargin: 0
             }
             height: 555
-        }
+            }*/
 
         Image {
             id: s1_fg

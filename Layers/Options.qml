@@ -2,6 +2,8 @@ import QtQuick
 import QtMultimedia
 import Quickshell
 import Quickshell.Wayland
+
+import qs.Data
 import qs.Widgets as Wid
 
 Scope {
@@ -231,7 +233,7 @@ Scope {
 
                                     Text {
                                         text: barOuter.modelData.role
-                                        font.family: bebasNeue.name
+                                        font.family: Fonts.bebasNeue.name
                                         font.pixelSize: 50
                                         color: "white"
                                         rotation: -30
@@ -247,7 +249,7 @@ Scope {
                                         Text {
                                             anchors.centerIn: parent
                                             text: barOuter.modelData.label
-                                            font.family: bebasNeue.name
+                                            font.family: Fonts.bebasNeue.name
                                             font.pixelSize: 28
                                             color: barOuter.isActive ? "#111111" : "#d9ffffff"
                                             Behavior on color {

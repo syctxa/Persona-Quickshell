@@ -19,7 +19,7 @@ Rectangle {
         return Math.floor(Math.random() * (max - min - 1)) + min + 1
       }
       width: 3
-      color: "#bf" + Color.colors.primary
+      color: "#bf" + Color.primary
       bottomLeftRadius: width/2
       bottomRightRadius: width/2
       x: {

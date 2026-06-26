@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
 import Quickshell
-import "../Data" as Dat
+import qs.Data as Dat
 import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.Io

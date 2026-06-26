@@ -64,14 +64,13 @@ Scope {
                 clip: true
 
                 Rectangle {
+                    id: blueBar
                     width: parent.width * 2
                     height: parent.height * 0.2
                     x: -parent.width * 0.2
                     y: parent.height * -0.1
                     color: "#1a4fa8"
                     transform: Rotation {
-                        origin.x: parent.width / 2
-                        origin.y: parent.height / 2
                         angle: 20
                     }
                 }
@@ -83,14 +82,13 @@ Scope {
                 visible: root.contentVisible
                 z: 2
                 Rectangle {
+                    id: whiteLine
                     width: parent.width * 200
                     height: 5
                     x: -parent.width * 0.2
                     y: parent.height * 0.99
                     color: "white"
                     transform: Rotation {
-                        origin.x: parent.width / 2
-                        origin.y: parent.height / 2
                         angle: -20
                     }
                 }
@@ -218,8 +216,8 @@ Scope {
 
         Item {
             visible: entryRoot.todayFlag
-            anchors.left: parent.left - 109
-            anchors.verticalCenter: parent.verticalCenter * -10
+            anchors.left: parent.left
+            y: -10
             width: entryRoot.numSize * 1.5
             height: width
             Rectangle {

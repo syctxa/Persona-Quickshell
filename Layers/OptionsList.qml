@@ -1,3 +1,5 @@
+pragma ComponentBehavior: Bound
+
 import QtQuick
 import Quickshell
 import Quickshell.Io
@@ -12,14 +14,7 @@ Item {
     property int localTab: activeBar
     property int activeShaderIndex: -1
     onActiveBarChanged: localTab = activeBar
-    FontLoader {
-        id: bebasNeue
-        source: Qt.resolvedUrl("../Assets/fonts/BebasNeue-Regular.ttf")
-    }
-    FontLoader {
-        id: montserrat
-        source: Qt.resolvedUrl("../Assets/fonts/Montserrat-Light.ttf")
-    }
+
     readonly property var revealContent: [
         {
             upper: ["Filter to reduce Bluelight"],
@@ -295,7 +290,7 @@ Item {
                     delegate: Text {
                         required property string modelData
                         text: modelData
-                        font.family: montserrat.name
+                        font.family: Dat.Fonts.montserrat.name
                         font.pixelSize: 20
                         color: "white"
                         horizontalAlignment: Text.AlignHCenter
@@ -340,7 +335,7 @@ Item {
 
                 Text {
                     text: revealRoot.revealContent[revealRoot.localTab].lower
-                    font.family: montserrat.name
+                    font.family: Dat.Fonts.montserrat.name
                     font.pixelSize: 18
                     color: "white"
                     wrapMode: Text.Wrap
@@ -349,7 +344,7 @@ Item {
 
                 Text {
                     text: revealRoot.activeShaderIndex === revealRoot.localTab ? "● ON" : "○ OFF"
-                    font.family: bebasNeue.name
+                    font.family: Dat.Fonts.bebasNeue.name
                     font.pixelSize: 16
                     color: revealRoot.activeShaderIndex === revealRoot.localTab ? "#4a8fff" : "#66ffffff"
                     Behavior on color {

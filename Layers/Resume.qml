@@ -4,7 +4,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.Data as Dat
 import qs.Widgets as Wid
-import qs.Widgets.Info as Info
+import qs.Services as Info
 import QtQuick.Controls
 
 Scope {

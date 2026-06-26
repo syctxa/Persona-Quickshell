@@ -1,5 +1,7 @@
 import QtQuick
 
+import qs.Data
+
 Item {
     id: root
 
@@ -10,7 +12,7 @@ Item {
     property int size: 11
     property var color: Colors.text
     property int scrollRate: 5
-    property int pauseDuration: Globals.anim.durations.normal
+    property int pauseDuration: Anims.duration.medium
 
     clip: true
     width: Math.min(maxWidth, text1.paintedWidth)

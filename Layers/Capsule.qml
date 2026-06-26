@@ -1,7 +1,7 @@
 import Quickshell.Wayland
 import Quickshell
-import "../Data" as Dat
-import "../Widgets" as Wid
+import qs.Data as Dat
+import qs.Widgets as Wid
 import Quickshell.Services.Mpris
 import QtQuick
 import QtQuick.Controls

@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import "../Data" as Dat
+import qs.Data as Dat
 import Quickshell.Io
 import Quickshell.Widgets
 import Quickshell.Wayland

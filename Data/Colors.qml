@@ -29,6 +29,8 @@ Singleton {
     readonly property string color15: "#c2c3c6"
 
     // Named aliases
+    readonly property color primary: color1
+
     readonly property string black: color0
     readonly property string red: color1
     readonly property string green: color2

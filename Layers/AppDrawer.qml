@@ -4,9 +4,9 @@ import QtQuick.Controls
 import QtQuick.Effects
 import Quickshell
 import qs.Data as Dat
-import "../Widgets" as Wid
+import qs.Widgets as Wid
 import Quickshell.Wayland
-import "../Layers" as Lay
+import qs.Layers as Lay
 
 Scope {
     id: root
